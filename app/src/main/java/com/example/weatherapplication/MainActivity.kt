@@ -11,6 +11,7 @@ import androidx.navigation.ui.NavigationUI.setupWithNavController
 import com.example.weatherapplication.remoteDataSource.WeatherRemoteDataSource
 import com.google.android.material.navigation.NavigationView
 import kotlinx.coroutines.launch
+import java.util.Calendar
 
 class MainActivity : AppCompatActivity() {
 
@@ -30,10 +31,6 @@ class MainActivity : AppCompatActivity() {
         }
         val navController = findNavController(this, R.id.nav_host_fragment)
         setupWithNavController(navigationView, navController)
-        lifecycleScope.launch {
-
-        WeatherRemoteDataSource.getInstance().getWeathers()
-        }
 
     }
 

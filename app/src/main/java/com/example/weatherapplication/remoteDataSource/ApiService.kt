@@ -1,5 +1,6 @@
 package com.example.weatherapplication.remoteDataSource
 
+import com.example.weatherapplication.Constant
 import com.example.weatherapplication.model.Root
 import retrofit2.Response
 import retrofit2.http.GET
@@ -11,6 +12,7 @@ interface ApiService {
         @Query("lat") lat: Double,
         @Query("lon") lon: Double,
         @Query("appid") apiKey: String,
-        @Query("units") units: String
+        @Query("units") units: String = Constant.Units.CELSIUS,
+        @Query("lang") lang:String = Constant.Language.ENGLISH
     ): Response<Root>
 }

@@ -1,10 +1,11 @@
 package com.example.weatherapplication.remoteDataSource
 
 import com.example.weatherapplication.model.Root
+import kotlinx.coroutines.flow.Flow
 import retrofit2.Response
 
 
 interface IWeatherRemoteDataSource {
 
-    suspend fun getWeathers():Response<Root>
+    fun getWeathers(lat:Double,lon:Double):Flow<Response<Root>>
 }

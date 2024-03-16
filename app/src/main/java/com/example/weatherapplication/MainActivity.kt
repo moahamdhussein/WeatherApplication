@@ -1,5 +1,7 @@
 package com.example.weatherapplication
 
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
@@ -28,6 +30,7 @@ class MainActivity : AppCompatActivity() {
             actionBar.setHomeAsUpIndicator(R.drawable.menu)
             actionBar.setDisplayShowHomeEnabled(true)
             actionBar.setDisplayHomeAsUpEnabled(true)
+            actionBar.setBackgroundDrawable(ColorDrawable(resources.getColor(R.color.background,resources.newTheme())))
         }
         val navController = findNavController(this, R.id.nav_host_fragment)
         setupWithNavController(navigationView, navController)

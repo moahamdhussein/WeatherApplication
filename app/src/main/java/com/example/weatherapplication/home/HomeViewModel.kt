@@ -16,7 +16,7 @@ class HomeViewModel(private val repository: WeatherRepository): ViewModel() {
     val  weatherStatus : StateFlow<Root> = _weatherStatus
 
     init {
-        getWeatherStatus(55.7522,37.6156)
+        getWeatherStatus(30.033333,31.233334)
     }
 
     fun getWeatherStatus(lat:Double,lon:Double) {

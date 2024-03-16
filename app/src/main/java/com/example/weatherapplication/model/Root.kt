@@ -7,7 +7,7 @@ data class Root(
     @SerializedName("cod") var cod: String? = null,
     @SerializedName("message") var message: Int? = null,
     @SerializedName("cnt") var cnt: Int? = null,
-    @SerializedName("list") var list: ArrayList<WeatherProperty> = arrayListOf(),
+    @SerializedName("list") var list: MutableList<WeatherProperty> = mutableListOf(),
     @SerializedName("city") var city: City? = City()
 
 )

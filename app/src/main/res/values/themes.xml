@@ -1,9 +1,15 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
     <style name="Base.Theme.WeatherApplication" parent="Theme.Material3.DayNight">
-        <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+<!--        Customize your light theme here.-->
+<!--        <item name="colorPrimary">@color/background</item>-->
+<!--        <item name="actionBarStyle">@style/MyActionBar</item>-->
+        <item name="titleTextColor">@color/white</item>
     </style>
+<!--    <style name="MyActionBar">-->
+<!--        <item name="android:background">@color/background</item>-->
+<!--    </style>-->
+
 
     <style name="Theme.WeatherApplication" parent="Base.Theme.WeatherApplication" />
 </resources>

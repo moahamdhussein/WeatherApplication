@@ -28,7 +28,7 @@ class DailyForecastAdapter(
 
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        holder.tvTemperature.text =
+        /*holder.tvTemperature.text =
             "${(weatherProperty[(holder.adapterPosition / 3)].main?.temp)?.toInt()}"
         Log.i(TAG, "onBindViewHolder: ${(holder.adapterPosition / 3)}")
         if (startTime > 12) {
@@ -41,7 +41,20 @@ class DailyForecastAdapter(
         startTime++
         if (startTime == 24) {
             startTime = 0
+        }*/
+
+        holder.tvTemperature.text = "${(weatherProperty[position].main?.temp)?.toInt()}\u00B0"
+        val time = weatherProperty[position].dtTxt?.split(" ")?.get(1)?.substring(0,2)?.toInt() ?:0
+        if (time > 12 ){
+            holder.tvTime.text = "${time-12} pm"
+        }else if (time ==0){
+            holder.tvTime.text=" 12 am"
+        }else if (time==12){
+            holder.tvTime.text=" 12 pm"
+        } else{
+            holder.tvTime.text = "$time am"
         }
+        holder.tvDate.text= weatherProperty[position].dtTxt?.split(" ")?.get(0)
         holder.ivCloudIcon.setImageDrawable(ContextCompat.getDrawable(context, R.drawable.sunny))
     }
 
@@ -53,18 +66,21 @@ class DailyForecastAdapter(
     }
 
     override fun getItemCount(): Int {
-        return weatherProperty.size * 3
+//        return weatherProperty.size * 3
+        return weatherProperty.size
     }
 
     inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         var tvTemperature: TextView
         var ivCloudIcon: ImageView
         var tvTime: TextView
+        var tvDate:TextView
 
         init {
             tvTime = itemView.findViewById(R.id.tv_item_time)
             tvTemperature = itemView.findViewById(R.id.tv_item_temperature)
             ivCloudIcon = itemView.findViewById(R.id.iv_item_cloud_icon)
+            tvDate = itemView.findViewById(R.id.tv_item_date)
         }
     }
 }

@@ -75,9 +75,8 @@ class HomeFragment : Fragment() {
 
     private fun setDailyListData(list: MutableList<WeatherProperty>) {
         var time = (list[0].dtTxt?.split(" ")?.get(1)?.split(":")?.get(0))?.toInt()
-        Log.i(TAG, "addData: ${(24 - time!!) / 3}")
-        homeAdapter.setList(list.subList(0, (24 - time!!) / 3))
-        setNextDaysData(list)
+//        homeAdapter.setList(list.subList(0, (24 - time!!) / 3))
+        homeAdapter.setList(list)
 
     }
 
@@ -118,6 +117,7 @@ class HomeFragment : Fragment() {
 
     private fun updateUi(root: Root) {
         setDailyListData(root.list)
+        setNextDaysData(root.list)
         val dateFormat = SimpleDateFormat("EE, dd MMM", Locale.getDefault())
         val formattedDate = dateFormat.format(calendar.time)
         tvTodayDate.text = formattedDate

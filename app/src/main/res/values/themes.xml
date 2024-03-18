@@ -10,6 +10,10 @@
 <!--        <item name="android:background">@color/background</item>-->
 <!--    </style>-->
 
+    <style name="Widget.App.RadioButton" parent="Widget.Material3.CompoundButton.RadioButton">
+        <item name="buttonTint">#ff03df</item>
+    </style>
+
 
     <style name="Theme.WeatherApplication" parent="Base.Theme.WeatherApplication" />
 </resources>

@@ -57,8 +57,6 @@ class SettingFragment : Fragment() {
         rootView = view
         initialization()
         getCheckedButton()
-
-
     }
 
     private fun initialization() {

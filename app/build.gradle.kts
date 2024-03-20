@@ -35,6 +35,9 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
+    buildFeatures{
+        viewBinding = true
+    }
 }
 
 dependencies {
@@ -75,5 +78,12 @@ dependencies {
     // navigation Component
     implementation ("androidx.navigation:navigation-fragment:2.7.7")
     implementation ("androidx.navigation:navigation-ui:2.7.7")
+
+    // open street map
+    implementation ("org.osmdroid:osmdroid-android:6.1.14")
+
+    //fab button
+    implementation ("com.getbase:floatingactionbutton:1.10.1")
+
 
 }

@@ -15,4 +15,22 @@
         android:name="com.example.weatherapplication.settings.SettingFragment"
         android:label="fragment_setting"
         tools:layout="@layout/fragment_setting" />
+    <fragment
+        android:id="@+id/favouriteFragment"
+        android:name="com.example.weatherapplication.favouriteList.FavouriteFragment"
+        android:label="fragment_favourite"
+        tools:layout="@layout/fragment_favourite" >
+        <action
+            android:id="@+id/action_favouriteFragment_to_mapFragment3"
+            app:destination="@id/mapFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/mapFragment"
+        android:name="com.example.weatherapplication.mapFragment.MapFragment"
+        android:label="fragment_map"
+        tools:layout="@layout/fragment_map" >
+        <action
+            android:id="@+id/action_mapFragment_to_favouriteFragment"
+            app:destination="@id/favouriteFragment" />
+    </fragment>
 </navigation>

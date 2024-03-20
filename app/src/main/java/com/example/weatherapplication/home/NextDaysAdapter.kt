@@ -47,7 +47,7 @@ class NextDaysAdapter(
         return 5
     }
 
-    private fun getMinMaxTemp(list: MutableList<WeatherProperty>) {
+    private fun getMinMaxTemp() {
         weatherProperty.forEach {
             val key = it.dtTxt?.split(" ")?.get(0)
             val min = (it.main?.tempMin)?.toInt()
@@ -67,7 +67,7 @@ class NextDaysAdapter(
 
     fun setList(list: MutableList<WeatherProperty>) {
         weatherProperty = list
-        getMinMaxTemp(list)
+        getMinMaxTemp()
         notifyDataSetChanged()
     }
 

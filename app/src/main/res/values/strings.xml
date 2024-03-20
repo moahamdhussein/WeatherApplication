@@ -15,4 +15,5 @@
     <string name="fahrenheit">Fahrenheit</string>
     <string name="metric_second">Meter / Second</string>
     <string name="mile_hour">Mile / Hour</string>
+    <string name="save">save</string>
 </resources>

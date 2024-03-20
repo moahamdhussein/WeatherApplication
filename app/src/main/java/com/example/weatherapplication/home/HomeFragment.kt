@@ -14,6 +14,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.weatherapplication.R
+import com.example.weatherapplication.localDataSource.WeatherLocalDataSource
 import com.example.weatherapplication.model.Root
 import com.example.weatherapplication.model.WeatherProperty
 import com.example.weatherapplication.model.WeatherRepository
@@ -31,11 +32,11 @@ class HomeFragment : Fragment() {
     private lateinit var viewModel: HomeViewModel
     private lateinit var factory: HomeViewModelFactory
     private lateinit var rvDaily: RecyclerView
-    private lateinit var rvNextDays:RecyclerView
-    private lateinit var nextDaysManager:LinearLayoutManager
+    private lateinit var rvNextDays: RecyclerView
+    private lateinit var nextDaysManager: LinearLayoutManager
     private lateinit var dailyManager: LinearLayoutManager
     private lateinit var homeAdapter: DailyForecastAdapter
-    private lateinit var nextDaysAdapter:NextDaysAdapter
+    private lateinit var nextDaysAdapter: NextDaysAdapter
     private lateinit var tvTodayDate: TextView
     private lateinit var tvCity: TextView
     private lateinit var tvDegree: TextView
@@ -58,8 +59,13 @@ class HomeFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         calendar = Calendar.getInstance()
         factory =
-            HomeViewModelFactory(repo = WeatherRepository.getInstance(WeatherRemoteDataSource.getInstance()))
-        viewModel = ViewModelProvider(this, factory).get(HomeViewModel::class.java)
+            HomeViewModelFactory(
+                repo = WeatherRepository.getInstance(
+                    WeatherRemoteDataSource.getInstance(),
+                    WeatherLocalDataSource(requireContext())
+                )
+            )
+        viewModel = ViewModelProvider(this, factory)[HomeViewModel::class.java]
         initializeUi(view)
         lifecycleScope.launch {
             viewModel.weatherStatus.collectLatest {
@@ -67,7 +73,6 @@ class HomeFragment : Fragment() {
                     if (it.list.size > 0) {
                         updateUi(it)
                     }
-
                 }
             }
         }
@@ -80,7 +85,7 @@ class HomeFragment : Fragment() {
 
     }
 
-    private fun setNextDaysData(list: MutableList<WeatherProperty>){
+    private fun setNextDaysData(list: MutableList<WeatherProperty>) {
         nextDaysAdapter.setList(list)
     }
 
@@ -107,11 +112,11 @@ class HomeFragment : Fragment() {
 
 
 
-        nextDaysManager=LinearLayoutManager(context)
-        nextDaysManager.orientation=RecyclerView.VERTICAL
-        nextDaysAdapter= NextDaysAdapter(mutableListOf(),requireContext())
-        rvNextDays.layoutManager=nextDaysManager
-        rvNextDays.adapter=nextDaysAdapter
+        nextDaysManager = LinearLayoutManager(context)
+        nextDaysManager.orientation = RecyclerView.VERTICAL
+        nextDaysAdapter = NextDaysAdapter(mutableListOf(), requireContext())
+        rvNextDays.layoutManager = nextDaysManager
+        rvNextDays.adapter = nextDaysAdapter
 
     }
 

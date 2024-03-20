@@ -1,24 +1,22 @@
 package com.example.weatherapplication
 
-import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.os.Bundle
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
-import androidx.lifecycle.lifecycleScope
+import androidx.navigation.NavController
 import androidx.navigation.Navigation.findNavController
+import androidx.navigation.ui.NavigationUI
 import androidx.navigation.ui.NavigationUI.setupWithNavController
-import com.example.weatherapplication.remoteDataSource.WeatherRemoteDataSource
 import com.google.android.material.navigation.NavigationView
-import kotlinx.coroutines.launch
-import java.util.Calendar
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var drawerLayout:DrawerLayout
-    private lateinit var navigationView:NavigationView
+    private lateinit var drawerLayout: DrawerLayout
+    private lateinit var navigationView: NavigationView
+    private lateinit var navController: NavController
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -30,9 +28,16 @@ class MainActivity : AppCompatActivity() {
             actionBar.setHomeAsUpIndicator(R.drawable.menu)
             actionBar.setDisplayShowHomeEnabled(true)
             actionBar.setDisplayHomeAsUpEnabled(true)
-            actionBar.setBackgroundDrawable(ColorDrawable(resources.getColor(R.color.background,resources.newTheme())))
+            actionBar.setBackgroundDrawable(
+                ColorDrawable(
+                    resources.getColor(
+                        R.color.background,
+                        resources.newTheme()
+                    )
+                )
+            )
         }
-        val navController = findNavController(this, R.id.nav_host_fragment)
+        navController = findNavController(this, R.id.nav_host_fragment)
         setupWithNavController(navigationView, navController)
 
     }
@@ -48,5 +53,9 @@ class MainActivity : AppCompatActivity() {
             return true
         }
         return super.onOptionsItemSelected(item)
+    }
+
+    override fun onSupportNavigateUp(): Boolean {
+        return navController.navigateUp() || super.onSupportNavigateUp()
     }
 }

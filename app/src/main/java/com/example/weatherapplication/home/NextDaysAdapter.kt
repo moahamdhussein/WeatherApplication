@@ -8,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.example.weatherapplication.R
 import com.example.weatherapplication.getDayName
 import com.example.weatherapplication.model.WeatherProperty
@@ -20,10 +21,10 @@ class NextDaysAdapter(
 
 ) : RecyclerView.Adapter<NextDaysAdapter.ViewHolder>() {
 
-    private lateinit var dailyMinMaxTemp: HashMap<String?, MutableList<Int?>>
+    private lateinit var dailyMinMaxTemp: MutableMap<String?, MutableList<Int?>>
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NextDaysAdapter.ViewHolder {
-        dailyMinMaxTemp = HashMap()
+        dailyMinMaxTemp = mutableMapOf()
         val inflater: LayoutInflater = LayoutInflater.from(parent.context)
         val view: View = inflater.inflate(R.layout.next_days_item, parent, false)
         return ViewHolder(view)
@@ -32,6 +33,7 @@ class NextDaysAdapter(
     override fun onBindViewHolder(holder: NextDaysAdapter.ViewHolder, position: Int) {
         if (weatherProperty.size > 0) {
             val key = dailyMinMaxTemp.keys.toList()[position]
+            Log.i(TAG, "onBindViewHolder: $key")
             if (holder.adapterPosition == 0) {
                 holder.tvTime.text = "Today"
             } else {
@@ -40,6 +42,12 @@ class NextDaysAdapter(
             }
             holder.tvTemperature.text =
                 "${dailyMinMaxTemp[key]?.get(0)}° / ${dailyMinMaxTemp[key]?.get(1)}°"
+
+            val currentWeather =
+                weatherProperty.stream().filter { it.dtTxt?.split(" ")?.get(0).equals(key) }.findFirst().get()
+            Glide.with(holder.itemView)
+                .load("https://openweathermap.org/img/wn/${currentWeather.weather[0].icon}@2x.png")
+                .into(holder.ivCloudIcon)
         }
     }
 
@@ -60,9 +68,14 @@ class NextDaysAdapter(
                     dailyMinMaxTemp[key]?.set(1, max)
                 }
             } else {
+                Log.i(TAG, "getMinMaxTemp: $key")
                 dailyMinMaxTemp[key] = mutableListOf(min, max)
+
+                Log.i(TAG, "getMinMaxTemp: ${dailyMinMaxTemp.keys}")
             }
+
         }
+
     }
 
     fun setList(list: MutableList<WeatherProperty>) {

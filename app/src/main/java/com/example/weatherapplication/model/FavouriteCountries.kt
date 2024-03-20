@@ -10,5 +10,7 @@ data class FavouriteCountries(
 
     val latitude: Double,
 
-    val cityName: String
+    val cityName: String,
+
+    val type: String
 )

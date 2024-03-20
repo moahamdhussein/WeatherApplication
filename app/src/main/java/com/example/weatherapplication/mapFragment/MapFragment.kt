@@ -138,7 +138,7 @@ class MapFragment : Fragment() {
             val localDataSource = WeatherLocalDataSource(requireContext())
             val cityName = getAddressFromLocation(lat,long)
             lifecycleScope.launch(Dispatchers.IO) {
-                localDataSource.insertFavouriteCountry(FavouriteCountries(long,lat,cityName))
+                localDataSource.insertFavouriteCountry(FavouriteCountries(long,lat,cityName,""))
             }
             Navigation.findNavController(binding.root).navigate(MapFragmentDirections.actionMapFragmentToFavouriteFragment())
         } else {
@@ -153,7 +153,7 @@ class MapFragment : Fragment() {
         val cityName = addresses?.get(0)?.adminArea
         val countryName = addresses?.get(0)?.countryName
 
-        return "${cityName?:""} $countryName"
+        return "${cityName?.split("G","g")?.get(0) ?:""} $countryName"
     }
 
 

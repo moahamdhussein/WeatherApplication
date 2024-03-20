@@ -31,7 +31,7 @@ class FavouriteAdapter(private var dataSet: List<FavouriteCountries>)
             holder.tvTitle.text = it.cityName
             holder.tvCoordinator.text="${it.latitude} , ${it.longitude}"
         }
-        holder.btnDelete.setOnClickListener { Log.i(TAG, "onBindViewHolder: $currentItem") }
+        holder.btnDelete.setOnClickListener { Log.i(TAG, "onBindViewHolder:  $currentItem") }
     }
 
     override fun getItemCount(): Int {

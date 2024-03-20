@@ -1,6 +1,8 @@
 package com.example.weatherapplication.home
 
+import android.annotation.SuppressLint
 import android.os.Bundle
+import android.os.Looper
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -13,12 +15,19 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
 import com.example.weatherapplication.R
 import com.example.weatherapplication.localDataSource.WeatherLocalDataSource
 import com.example.weatherapplication.model.Root
 import com.example.weatherapplication.model.WeatherProperty
 import com.example.weatherapplication.model.WeatherRepository
 import com.example.weatherapplication.remoteDataSource.WeatherRemoteDataSource
+import com.google.android.gms.location.FusedLocationProviderClient
+import com.google.android.gms.location.LocationCallback
+import com.google.android.gms.location.LocationRequest
+import com.google.android.gms.location.LocationResult
+import com.google.android.gms.location.LocationServices
+import com.google.android.gms.location.Priority
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -48,6 +57,8 @@ class HomeFragment : Fragment() {
     private lateinit var tvCloudPercentage: TextView
     private lateinit var tvPressure: TextView
     private lateinit var calendar: Calendar
+    private lateinit var fusedLocationProvider: FusedLocationProviderClient
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View? {
@@ -57,7 +68,8 @@ class HomeFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        calendar = Calendar.getInstance()
+        getRefreshLocation()
+
         factory =
             HomeViewModelFactory(
                 repo = WeatherRepository.getInstance(
@@ -79,10 +91,7 @@ class HomeFragment : Fragment() {
     }
 
     private fun setDailyListData(list: MutableList<WeatherProperty>) {
-        var time = (list[0].dtTxt?.split(" ")?.get(1)?.split(":")?.get(0))?.toInt()
-//        homeAdapter.setList(list.subList(0, (24 - time!!) / 3))
         homeAdapter.setList(list)
-
     }
 
     private fun setNextDaysData(list: MutableList<WeatherProperty>) {
@@ -118,6 +127,8 @@ class HomeFragment : Fragment() {
         rvNextDays.layoutManager = nextDaysManager
         rvNextDays.adapter = nextDaysAdapter
 
+        calendar = Calendar.getInstance()
+
     }
 
     private fun updateUi(root: Root) {
@@ -128,12 +139,12 @@ class HomeFragment : Fragment() {
         tvTodayDate.text = formattedDate
         tvCity.text = root.city?.name ?: "not found"
         tvDegree.text = "${(root.list.get(0).main?.temp)?.toInt()} \u00B0"
-        mainWeatherIcon.setImageDrawable(
-            ContextCompat.getDrawable(
-                requireContext(),
-                R.drawable.sunny
-            )
-        )
+        Glide.with(this)
+            .load("https://openweathermap.org/img/wn/${root.list[0].weather[0].icon}@2x.png")
+            .into(mainWeatherIcon)
+
+
+
         tvWeatherDescription.text = root.list[0].weather[0].description
         val hours = calendar.get(Calendar.HOUR_OF_DAY)
         val minute = calendar.get(Calendar.MINUTE)
@@ -149,6 +160,29 @@ class HomeFragment : Fragment() {
         tvCloudPercentage.text = "${root.list[0].clouds?.all}%"
         tvPressure.text = "${root.list[0].main?.pressure}pha"
 
+    }
+
+    @SuppressLint("MissingPermission")
+    private fun getRefreshLocation() {
+        fusedLocationProvider = LocationServices.getFusedLocationProviderClient(requireActivity())
+        fusedLocationProvider.requestLocationUpdates(
+
+            LocationRequest.Builder(1000).apply {
+                setPriority(Priority.PRIORITY_HIGH_ACCURACY)
+            }.build(),
+            object : LocationCallback() {
+
+                @SuppressLint("SetTextI18n")
+                override fun onLocationResult(locatioResult: LocationResult) {
+                    super.onLocationResult(locatioResult)
+                    val lastLocation = locatioResult.lastLocation
+                    val latitudeValue: Double = lastLocation?.latitude ?:0.0
+                    val longitudeValue: Double = lastLocation?.longitude ?:0.0
+                    viewModel.getWeatherStatus(latitudeValue,longitudeValue)
+                }
+            },
+            Looper.myLooper()
+        )
     }
 
 

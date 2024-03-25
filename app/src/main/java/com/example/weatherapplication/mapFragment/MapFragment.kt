@@ -140,7 +140,7 @@ class MapFragment : Fragment() {
             lifecycleScope.launch(Dispatchers.IO) {
                 localDataSource.insertFavouriteCountry(FavouriteCountries(long,lat,cityName,""))
             }
-            Navigation.findNavController(binding.root).navigate(MapFragmentDirections.actionMapFragmentToFavouriteFragment())
+            Navigation.findNavController(binding.root).popBackStack()
         } else {
 
             Log.i(TAG, "setListeners: not selected")

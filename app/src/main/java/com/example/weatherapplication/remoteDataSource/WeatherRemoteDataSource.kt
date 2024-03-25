@@ -1,10 +1,12 @@
 package com.example.weatherapplication.remoteDataSource
 
+import android.util.Log
 import com.example.weatherapplication.Constant
 import com.example.weatherapplication.model.Root
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import retrofit2.Response
+
 
 private const val TAG = "WeatherRemoteDataSource"
 
@@ -14,13 +16,16 @@ class WeatherRemoteDataSource : IWeatherRemoteDataSource {
         RetrofitHelper.getInstance().create(ApiService::class.java)
     }
 
-    override fun getWeathers(lat: Double, lon: Double): Flow<Response<Root>> {
+    override fun getWeathers(lat: Double, lon: Double,unit: String,language: String): Flow<Response<Root>> {
         return flow {
+            Log.i(TAG, "getWeathers: flow send $language")
             emit(
                 weatherService.getWeatherDetails(
                     lat = lat,
                     lon = lon,
                     apiKey = Constant.API_KEY,
+                    lang = language,
+                    units = unit
                 )
             )
         }
@@ -39,4 +44,3 @@ class WeatherRemoteDataSource : IWeatherRemoteDataSource {
 
 }
 
-//lat=55.7522&lon=37.6156

@@ -1,7 +1,9 @@
-package com.example.weatherapplication.model
+package com.example.weatherapplication.repository
 
+import com.example.weatherapplication.Constant
 import com.example.weatherapplication.localDataSource.IWeatherLocalDataSource
-import com.example.weatherapplication.localDataSource.WeatherLocalDataSource
+import com.example.weatherapplication.model.FavouriteCountries
+import com.example.weatherapplication.model.Root
 import com.example.weatherapplication.remoteDataSource.IWeatherRemoteDataSource
 import kotlinx.coroutines.flow.Flow
 import retrofit2.Response
@@ -19,17 +21,24 @@ class WeatherRepository private constructor(
             weatherLocalDataSource: IWeatherLocalDataSource
         ): WeatherRepository {
             return instance ?: synchronized(this) {
-                val temp = WeatherRepository(weatherRemoteDataSource,weatherLocalDataSource)
+                val temp = WeatherRepository(weatherRemoteDataSource, weatherLocalDataSource)
                 instance = temp
                 temp
             }
         }
     }
 
-    override suspend fun getWeatherDetails(lat: Double, lon: Double): Flow<Response<Root>> {
+    override suspend fun getWeatherDetails(
+        lat: Double,
+        lon: Double,
+        unit: String,
+        language:String
+    ): Flow<Response<Root>> {
         return weatherRemoteDataSource.getWeathers(
             lat = lat,
-            lon = lon
+            lon = lon,
+            unit = unit,
+            language = language
         )
     }
 

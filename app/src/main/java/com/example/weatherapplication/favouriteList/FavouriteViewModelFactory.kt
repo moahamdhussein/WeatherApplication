@@ -2,8 +2,7 @@ package com.example.weatherapplication.favouriteList
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
-import com.example.weatherapplication.home.HomeViewModel
-import com.example.weatherapplication.model.WeatherRepository
+import com.example.weatherapplication.repository.WeatherRepository
 
 class FavouriteViewModelFactory(private val repo: WeatherRepository) : ViewModelProvider.Factory{
 

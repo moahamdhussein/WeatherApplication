@@ -4,13 +4,14 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
+import android.content.SharedPreferences
 import android.content.pm.PackageManager
+import android.content.res.Configuration
 import android.graphics.drawable.ColorDrawable
 import android.location.LocationManager
 import android.os.Bundle
 import android.os.Looper
 import android.provider.Settings
-import android.util.Log
 import android.view.MenuItem
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -20,7 +21,6 @@ import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.navigation.NavController
 import androidx.navigation.Navigation.findNavController
-import androidx.navigation.ui.NavigationUI
 import androidx.navigation.ui.NavigationUI.setupWithNavController
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
@@ -29,20 +29,28 @@ import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
 import com.google.android.material.navigation.NavigationView
+import java.util.Locale
 
 private const val REQUEST_LOCATION_CODE = 101
+private const val TAG = "MainActivity"
 
 class MainActivity : AppCompatActivity() {
-
+    
     private lateinit var drawerLayout: DrawerLayout
     private lateinit var navigationView: NavigationView
     private lateinit var navController: NavController
     private lateinit var fusedLocationProvider: FusedLocationProviderClient
+    private lateinit var sharedPreferences: SharedPreferences
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        sharedPreferences = getSharedPreferences("Setting", Context.MODE_PRIVATE)
+        if (sharedPreferences.getBoolean(Constant.LANGUAGE_KEY, true)) {
+            setLocale("en")
+        } else {
+            setLocale("ar")
+        }
         setContentView(R.layout.activity_main)
-
         drawerLayout = findViewById(R.id.drawer_layout)
         navigationView = findViewById(R.id.NavigationView)
         val actionBar = supportActionBar
@@ -102,7 +110,6 @@ class MainActivity : AppCompatActivity() {
     }
 
 
-
     private fun checkLocationPermission(): Boolean {
         var result = false
         if ((ContextCompat.checkSelfPermission(
@@ -152,5 +159,13 @@ class MainActivity : AppCompatActivity() {
         Toast.makeText(this, "open location", Toast.LENGTH_SHORT).show()
         val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
         startActivity(intent)
+    }
+
+    private fun setLocale(languageCode: String) {
+        val locale = Locale(languageCode)
+        Locale.setDefault(locale)
+        val config = Configuration()
+        config.setLocale(locale)
+        this.resources.updateConfiguration(config, this.resources.displayMetrics)
     }
 }

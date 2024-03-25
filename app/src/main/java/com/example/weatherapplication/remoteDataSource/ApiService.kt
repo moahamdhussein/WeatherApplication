@@ -12,7 +12,7 @@ interface ApiService {
         @Query("lat") lat: Double,
         @Query("lon") lon: Double,
         @Query("appid") apiKey: String,
-        @Query("units") units: String = Constant.Units.CELSIUS,
-        @Query("lang") lang:String = Constant.Language.ENGLISH
+        @Query("units") units: String ,
+        @Query("lang") lang:String
     ): Response<Root>
 }

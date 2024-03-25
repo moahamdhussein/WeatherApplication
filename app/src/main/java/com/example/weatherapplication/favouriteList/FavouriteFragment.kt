@@ -9,14 +9,11 @@ import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.Navigation
-import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.weatherapplication.R
 import com.example.weatherapplication.databinding.FragmentFavouriteBinding
-import com.example.weatherapplication.home.HomeViewModel
 import com.example.weatherapplication.localDataSource.WeatherLocalDataSource
-import com.example.weatherapplication.model.WeatherRepository
+import com.example.weatherapplication.repository.WeatherRepository
 import com.example.weatherapplication.remoteDataSource.WeatherRemoteDataSource
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest

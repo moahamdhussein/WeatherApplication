@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">تطبيق الطقس</string>
+    <string name="hello_blank_fragment">مرحبًا بالشاشة الفارغة</string>
+    <string name="daily_forecast">التنبؤ اليومي</string>
+    <string name="location">الموقع</string>
+    <string name="language">اللغة</string>
+    <string name="gps">نظام تحديد المواقع</string>
+    <string name="map">الخريطة</string>
+    <string name="arabic">العربية</string>
+    <string name="english">الإنجليزية</string>
+    <string name="temperature">درجة الحرارة</string>
+    <string name="celsius">درجة مئوية</string>
+    <string name="kelvin">كيلفن</string>
+    <string name="fahrenheit">فهرنهايت</string>
+    <string name="metric_second">متر / ثانية</string>
+    <string name="mile_hour">ميل / ساعة</string>
+    <string name="save">حفظ</string>
+    <string name="today">اليوم</string>
+</resources>

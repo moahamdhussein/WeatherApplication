@@ -28,9 +28,5 @@
         android:id="@+id/mapFragment"
         android:name="com.example.weatherapplication.mapFragment.MapFragment"
         android:label="fragment_map"
-        tools:layout="@layout/fragment_map" >
-        <action
-            android:id="@+id/action_mapFragment_to_favouriteFragment"
-            app:destination="@id/favouriteFragment" />
-    </fragment>
+        tools:layout="@layout/fragment_map" />
 </navigation>

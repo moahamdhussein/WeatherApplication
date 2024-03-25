@@ -16,15 +16,14 @@ import com.example.weatherapplication.model.WeatherProperty
 private const val TAG = "NextDaysAdapter"
 
 class NextDaysAdapter(
-    var weatherProperty: MutableList<WeatherProperty>,
-    val context: Context
+    private var weatherProperty: MutableList<WeatherProperty>,
+    private val context: Context
 
 ) : RecyclerView.Adapter<NextDaysAdapter.ViewHolder>() {
 
-    private lateinit var dailyMinMaxTemp: MutableMap<String?, MutableList<Int?>>
+    private var dailyMinMaxTemp: MutableMap<String?, MutableList<Int?>> = mutableMapOf()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NextDaysAdapter.ViewHolder {
-        dailyMinMaxTemp = mutableMapOf()
         val inflater: LayoutInflater = LayoutInflater.from(parent.context)
         val view: View = inflater.inflate(R.layout.next_days_item, parent, false)
         return ViewHolder(view)
@@ -35,7 +34,7 @@ class NextDaysAdapter(
             val key = dailyMinMaxTemp.keys.toList()[position]
             Log.i(TAG, "onBindViewHolder: $key")
             if (holder.adapterPosition == 0) {
-                holder.tvTime.text = "Today"
+                holder.tvTime.text = context.resources.getString(R.string.today)
             } else {
                 val dayName = getDayName(key ?: " ")
                 holder.tvTime.text = "${key?.takeLast(2)} $dayName"

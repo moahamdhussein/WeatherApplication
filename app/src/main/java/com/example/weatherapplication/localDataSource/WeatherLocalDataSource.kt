@@ -13,9 +13,6 @@ class WeatherLocalDataSource(context: Context) : IWeatherLocalDataSource {
         weatherDatabase.getFavouriteDao()
     }
 
-    init {
-
-    }
 
     override suspend fun insertFavouriteCountry(favouriteCountry: FavouriteCountries){
         dao.insertProduct(favouriteCountry)
@@ -28,5 +25,9 @@ class WeatherLocalDataSource(context: Context) : IWeatherLocalDataSource {
     }
     override fun getStoredFavouriteCountries() : Flow<List<FavouriteCountries>> {
         return dao.getAllFavouriteCountries()
+    }
+
+    override fun getAllAlarm(): Flow<List<FavouriteCountries>> {
+        return dao.getAllAlarm()
     }
 }

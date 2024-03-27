@@ -1,4 +1,4 @@
-package com.example.weatherapplication.favouriteList
+package com.example.weatherapplication.alarm
 
 import android.util.Log
 import android.view.LayoutInflater
@@ -10,18 +10,13 @@ import androidx.recyclerview.widget.RecyclerView
 import com.example.weatherapplication.R
 import com.example.weatherapplication.model.FavouriteCountries
 
-private const val TAG = "FavouriteAdapter"
-class FavouriteAdapter(private var dataSet: List<FavouriteCountries>)
-    : RecyclerView.Adapter<FavouriteAdapter.ViewHolder>() {
+private const val TAG = "AlarmAdapter"
+class AlarmAdapter(private var dataSet: List<FavouriteCountries>) :
+    RecyclerView.Adapter<AlarmAdapter.ViewHolder>() {
 
-    fun setList(newData: List<FavouriteCountries>) {
-        dataSet = newData
-        Log.i(TAG, "setList: ")
-        notifyDataSetChanged()
-    }
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val inflater: LayoutInflater = LayoutInflater.from(parent.context)
-        val view: View = inflater.inflate(R.layout.favourite_items, parent, false)
+        val view: View = inflater.inflate(R.layout.alarm_item, parent, false)
         return ViewHolder(view)
     }
 
@@ -30,22 +25,31 @@ class FavouriteAdapter(private var dataSet: List<FavouriteCountries>)
         currentItem.let {
             holder.tvTitle.text = it.cityName
             holder.tvCoordinator.text="${it.latitude} , ${it.longitude}"
+            holder.tvTime.text=it.date
         }
         holder.btnDelete.setOnClickListener { Log.i(TAG, "onBindViewHolder:  $currentItem") }
     }
 
-    override fun getItemCount(): Int {
-        return dataSet.size
+    fun setData(newData: List<FavouriteCountries>) {
+        dataSet = newData
+        notifyDataSetChanged()
     }
-    class ViewHolder(itemView: View) :RecyclerView.ViewHolder(itemView) {
-        var tvTitle:TextView
-        var tvCoordinator:TextView
-        var btnDelete:Button
+
+    override fun getItemCount(): Int {
+      return dataSet.size
+    }
+
+    class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        var tvTitle: TextView
+        var tvCoordinator: TextView
+        var tvTime:TextView
+        var btnDelete: Button
 
         init {
-            tvTitle = itemView.findViewById(R.id.tv_city_title_item)
-            tvCoordinator = itemView.findViewById(R.id.tv_city_coord_item)
-            btnDelete = itemView.findViewById(R.id.btn_delete)
+            tvTitle = itemView.findViewById(R.id.tv_city_coord_alarm_item)
+            tvCoordinator = itemView.findViewById(R.id.tv_city_title_alarm_item)
+            tvTime = itemView.findViewById(R.id.tv_alarm_time_item)
+            btnDelete = itemView.findViewById(R.id.btn_delete_alarm)
         }
     }
 }

@@ -3,7 +3,7 @@ package com.example.weatherapplication.model
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "favourite_countries", primaryKeys = ["longitude", "latitude"])
+@Entity(tableName = "favourite_countries", primaryKeys = ["longitude", "latitude","type"])
 data class FavouriteCountries(
 
     val longitude: Double,
@@ -12,5 +12,10 @@ data class FavouriteCountries(
 
     val cityName: String,
 
-    val type: String
-)
+    val type: String,
+
+    val date: String,
+
+    val alarmId:Int
+
+    )

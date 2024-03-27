@@ -19,7 +19,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
-    private const val TAG = "FavouriteFragment"
+private const val TAG = "FavouriteFragment"
+
 class FavouriteFragment : Fragment() {
 
     private lateinit var binding: FragmentFavouriteBinding
@@ -62,13 +63,14 @@ class FavouriteFragment : Fragment() {
 
     private fun initializeUi() {
         layoutManager = LinearLayoutManager(requireContext())
-        layoutManager.orientation=RecyclerView.VERTICAL
+        layoutManager.orientation = RecyclerView.VERTICAL
         binding.rvFavouriteList.layoutManager = layoutManager
         favouriteAdapter = FavouriteAdapter(listOf())
         binding.rvFavouriteList.adapter = favouriteAdapter
         binding.fabAddToFavourite.setOnClickListener {
             Log.i(TAG, "initializeUi: ")
-            Navigation.findNavController(binding.root).navigate(FavouriteFragmentDirections.actionFavouriteFragmentToMapFragment3())
+            Navigation.findNavController(binding.root)
+                .navigate(FavouriteFragmentDirections.actionFavouriteFragmentToMapFragment3("Favourite","-"))
         }
     }
 

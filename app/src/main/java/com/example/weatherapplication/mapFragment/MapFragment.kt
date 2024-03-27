@@ -1,6 +1,10 @@
 package com.example.weatherapplication.mapFragment
 
 import android.annotation.SuppressLint
+import android.app.AlarmManager
+import android.app.PendingIntent
+import android.content.Context
+import android.content.Intent
 import android.location.Address
 import android.location.Geocoder
 import android.os.Bundle
@@ -9,10 +13,12 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.Navigation
 import com.example.weatherapplication.R
+import com.example.weatherapplication.alarm.AlarmReceiver
 import com.example.weatherapplication.databinding.FragmentMapBinding
 import com.example.weatherapplication.localDataSource.WeatherLocalDataSource
 import com.example.weatherapplication.model.FavouriteCountries
@@ -28,6 +34,7 @@ import org.osmdroid.views.overlay.MapEventsOverlay
 import org.osmdroid.views.overlay.Marker
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
+import java.util.Calendar
 import kotlin.math.log
 
 private const val TAG = "MapFragment"
@@ -38,11 +45,14 @@ class MapFragment : Fragment() {
     private lateinit var mapController: IMapController
     private lateinit var locationOverlay: MyLocationNewOverlay
     private lateinit var selectedLocationMarker: Marker
+    private lateinit var type: String
+    private lateinit var date: String
 
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
+
     ): View {
         binding = FragmentMapBinding.inflate(inflater, container, false)
         return binding.root
@@ -50,6 +60,8 @@ class MapFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        type = MapFragmentArgs.fromBundle(requireArguments()).type
+        date = MapFragmentArgs.fromBundle(requireArguments()).date
         initializeUi()
         setUpLocationOverLay()
         animateToUserLocation()
@@ -57,9 +69,7 @@ class MapFragment : Fragment() {
         binding.btnSaveLocation.setOnClickListener { onSaveClick() }
 
 
-
     }
-
 
 
     private fun initializeUi() {
@@ -96,7 +106,6 @@ class MapFragment : Fragment() {
     }
 
 
-
     private fun updateSelectedLocationMarker(location: GeoPoint) {
         if (!::selectedLocationMarker.isInitialized) {
             selectedLocationMarker = Marker(binding.mapView).apply {
@@ -114,7 +123,7 @@ class MapFragment : Fragment() {
         binding.mapView.invalidate()
     }
 
-    private fun updateLocationOverlay(){
+    private fun updateLocationOverlay() {
         binding.mapView.overlays.add(MapEventsOverlay(object : MapEventsReceiver {
             override fun singleTapConfirmedHelper(p: GeoPoint?): Boolean {
                 return true
@@ -136,25 +145,56 @@ class MapFragment : Fragment() {
             val long = selectedLocation.longitude
 
             val localDataSource = WeatherLocalDataSource(requireContext())
-            val cityName = getAddressFromLocation(lat,long)
+            val cityName = getAddressFromLocation(lat, long)
             lifecycleScope.launch(Dispatchers.IO) {
-                localDataSource.insertFavouriteCountry(FavouriteCountries(long,lat,cityName,""))
+                var alarmId = Int.MIN_VALUE
+                Log.i(TAG, "onSaveClick: ${type == "Alarm"}")
+                if (type == "Alarm") {
+                    alarmId = (1..250).random()
+                    scheduleAlarm(requireContext(), date.toLong(), alarmId)
+                }
+                localDataSource.insertFavouriteCountry(
+                    FavouriteCountries(
+                        long,
+                        lat,
+                        cityName,
+                        type,
+                        date,
+                        alarmId
+                    )
+                )
+                launch(Dispatchers.Main) {
+
+                Navigation.findNavController(binding.root).popBackStack()
+                }
             }
-            Navigation.findNavController(binding.root).popBackStack()
         } else {
 
             Log.i(TAG, "setListeners: not selected")
         }
     }
+
     fun getAddressFromLocation(latitude: Double, longitude: Double): String {
         val geocoder = Geocoder(requireContext())
         val addresses: List<Address>? = geocoder.getFromLocation(latitude, longitude, 1)
-        Log.i(TAG, "getAddressFromLocation: "+addresses.toString())
+        Log.i(TAG, "getAddressFromLocation: " + addresses.toString())
         val cityName = addresses?.get(0)?.adminArea
         val countryName = addresses?.get(0)?.countryName
-
-        return "${cityName?.split("G","g")?.get(0) ?:""} $countryName"
+        return "${cityName?.split("G", "g")?.get(0) ?: ""} $countryName"
     }
 
+    fun scheduleAlarm(context: Context, triggerAtMillis: Long, alarmId: Int) {
+        Log.i(TAG, "scheduleAlarm: ")
+        val alarmManager = context.getSystemService(AppCompatActivity.ALARM_SERVICE) as AlarmManager
+        val intent = Intent(context, AlarmReceiver::class.java)
+        val pendingIntent = PendingIntent.getBroadcast(
+            context, alarmId, intent,
+            PendingIntent.FLAG_IMMUTABLE
+        )
 
+//           alarmManager.setExact(AlarmManager.RTC_WAKEUP, triggerAtMillis, pendingIntent)
+
+        alarmManager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAtMillis, pendingIntent)
+        Log.i(TAG, "scheduleAlarm: ")
+    }
 }

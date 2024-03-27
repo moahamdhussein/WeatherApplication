@@ -9,5 +9,5 @@ import retrofit2.Response
 
 interface IWeatherRemoteDataSource {
 
-    fun getWeathers(lat:Double,lon:Double,unit: String ,language:String):Flow<Response<Root>>
+    fun getWeathers(lat:Double,lon:Double,language:String):Flow<Response<Root>>
 }

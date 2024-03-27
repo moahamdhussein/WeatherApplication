@@ -16,7 +16,7 @@ class WeatherRemoteDataSource : IWeatherRemoteDataSource {
         RetrofitHelper.getInstance().create(ApiService::class.java)
     }
 
-    override fun getWeathers(lat: Double, lon: Double,unit: String,language: String): Flow<Response<Root>> {
+    override fun getWeathers(lat: Double, lon: Double,language: String): Flow<Response<Root>> {
         return flow {
             Log.i(TAG, "getWeathers: flow send $language")
             emit(
@@ -25,7 +25,7 @@ class WeatherRemoteDataSource : IWeatherRemoteDataSource {
                     lon = lon,
                     apiKey = Constant.API_KEY,
                     lang = language,
-                    units = unit
+                    units = Constant.Units.CELSIUS
                 )
             )
         }

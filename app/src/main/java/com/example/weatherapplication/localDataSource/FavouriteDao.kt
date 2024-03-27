@@ -12,8 +12,11 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface FavouriteDao {
 
-    @Query("SELECT * FROM favourite_countries")
+    @Query("SELECT * FROM favourite_countries Where type like'Favourite' ")
      fun getAllFavouriteCountries(): Flow<List<FavouriteCountries>>
+
+     @Query("SELECT * FROM favourite_countries Where type like'Alarm' ")
+     fun getAllAlarm(): Flow<List<FavouriteCountries>>
 
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)

@@ -30,7 +30,7 @@ class HomeViewModel(private val repository: WeatherRepository) : ViewModel() {
 
     fun getWeatherStatus(lat: Double, lon: Double, unit: String, language: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            repository.getWeatherDetails(lat = lat, lon = lon, unit = unit, language = language)
+            repository.getWeatherDetails(lat = lat, lon = lon,  language = language)
                 .take(10)
                 .takeIf { (it.first().body()?.list?.size ?: 0) > 0 }
                 ?.catch {

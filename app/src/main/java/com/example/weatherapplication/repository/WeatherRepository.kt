@@ -31,19 +31,21 @@ class WeatherRepository private constructor(
     override suspend fun getWeatherDetails(
         lat: Double,
         lon: Double,
-        unit: String,
         language:String
     ): Flow<Response<Root>> {
         return weatherRemoteDataSource.getWeathers(
             lat = lat,
             lon = lon,
-            unit = unit,
             language = language
         )
     }
 
     override suspend fun getFavouriteCountries(): Flow<List<FavouriteCountries>> {
         return weatherLocalDataSource.getStoredFavouriteCountries()
+    }
+
+    override suspend fun getAllAlarm(): Flow<List<FavouriteCountries>> {
+        return weatherLocalDataSource.getAllAlarm()
     }
 
     override suspend fun insertFavouriteCountry(favouriteCountry: FavouriteCountries) {

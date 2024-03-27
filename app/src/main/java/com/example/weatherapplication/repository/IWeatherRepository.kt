@@ -12,11 +12,11 @@ interface IWeatherRepository {
     suspend fun getWeatherDetails(
         lat: Double,
         lon: Double,
-        unit: String,
         language: String
     ): Flow<Response<Root>>
 
     suspend fun getFavouriteCountries(): Flow<List<FavouriteCountries>>
+    suspend fun getAllAlarm(): Flow<List<FavouriteCountries>>
 
     suspend fun insertFavouriteCountry(favouriteCountry: FavouriteCountries)
     suspend fun deleteFavouriteCountry(favouriteCountry: FavouriteCountries)

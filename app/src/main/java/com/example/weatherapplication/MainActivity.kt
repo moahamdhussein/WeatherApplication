@@ -91,7 +91,7 @@ class MainActivity : AppCompatActivity() {
 
     override fun onStart() {
         super.onStart()
-        if (checkLocationPermission()) {
+        /*if (checkLocationPermission()) {
             if (isLocationEnabled()) {
                 getRefreshLocation()
             } else {
@@ -106,7 +106,7 @@ class MainActivity : AppCompatActivity() {
                 ),
                 REQUEST_LOCATION_CODE
             )
-        }
+        }*/
     }
 
 

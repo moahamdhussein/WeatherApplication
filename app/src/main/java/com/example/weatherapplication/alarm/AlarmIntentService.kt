@@ -40,8 +40,9 @@ class AlarmIntentService : IntentService("AlarmIntentService"), CoroutineScope b
     }
     @Deprecated("Deprecated in Java")
     override fun onHandleIntent(intent: Intent?) {
-        val language: String = getSharedPreferences("Setting", Context.MODE_PRIVATE)
-            .getString(Constant.LANGUAGE_KEY, "en") ?: "en"
+        val isEnglish = getSharedPreferences("Setting", Context.MODE_PRIVATE)
+            .getBoolean(Constant.LANGUAGE_KEY, true)
+        val language: String = if (isEnglish) "en" else "ar"
         Log.i(TAG, "onHandleIntent: test")
         launch(Dispatchers.IO) {
             repo.getWeatherDetails(30.3000, 30.132132, language).collectLatest {

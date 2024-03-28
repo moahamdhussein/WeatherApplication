@@ -9,6 +9,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.example.weatherapplication.Constant
 import com.example.weatherapplication.R
 import com.example.weatherapplication.getDayName
 import com.example.weatherapplication.model.WeatherProperty
@@ -22,8 +23,25 @@ class NextDaysAdapter(
 ) : RecyclerView.Adapter<NextDaysAdapter.ViewHolder>() {
 
     private var dailyMinMaxTemp: MutableMap<String?, MutableList<Int?>> = mutableMapOf()
+    var convertCelsiusMultiplayer = 1.0
+    var convertCelsiusAddition = 0.0
+
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): NextDaysAdapter.ViewHolder {
+
+        val unit = context.getSharedPreferences("Setting", Context.MODE_PRIVATE).getString(
+            Constant.TEMPERATURE_Unit,
+            Constant.Units.CELSIUS
+        )
+
+        when (unit) {
+            Constant.Units.FAHRENHEIT -> {
+                convertCelsiusMultiplayer = 9.0 / 5.0
+                convertCelsiusAddition = 32.0
+            }
+
+            Constant.Units.KELVIN -> convertCelsiusAddition = 273.15
+        }
         val inflater: LayoutInflater = LayoutInflater.from(parent.context)
         val view: View = inflater.inflate(R.layout.next_days_item, parent, false)
         return ViewHolder(view)
@@ -39,11 +57,19 @@ class NextDaysAdapter(
                 val dayName = getDayName(key ?: " ")
                 holder.tvTime.text = "${key?.takeLast(2)} $dayName"
             }
+
             holder.tvTemperature.text =
-                "${dailyMinMaxTemp[key]?.get(0)}° / ${dailyMinMaxTemp[key]?.get(1)}°"
+                "${
+                    ((dailyMinMaxTemp[key]?.get(0)?.times(convertCelsiusMultiplayer))?.plus(
+                        convertCelsiusAddition
+                    ))?.toInt()
+                }° / ${((dailyMinMaxTemp[key]?.get(1)?.times(convertCelsiusMultiplayer))?.plus(
+                    convertCelsiusAddition
+                ))?.toInt()}°"
 
             val currentWeather =
-                weatherProperty.stream().filter { it.dtTxt?.split(" ")?.get(0).equals(key) }.findFirst().get()
+                weatherProperty.stream().filter { it.dtTxt?.split(" ")?.get(0).equals(key) }
+                    .findFirst().get()
             Glide.with(holder.itemView)
                 .load("https://openweathermap.org/img/wn/${currentWeather.weather[0].icon}@2x.png")
                 .into(holder.ivCloudIcon)

@@ -1,14 +1,23 @@
 package com.example.weatherapplication.home
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.Intent
 import android.content.SharedPreferences
+import android.content.pm.PackageManager
+import android.location.LocationManager
 import android.net.ConnectivityManager
 import android.os.Bundle
 import android.os.Looper
+import android.provider.Settings
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -28,13 +37,14 @@ import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
-import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
 
+private const val TAG = "HomeFragment"
+private const val REQUEST_LOCATION_CODE = 101
 
 class HomeFragment : Fragment() {
     private lateinit var viewModel: HomeViewModel
@@ -51,7 +61,9 @@ class HomeFragment : Fragment() {
     private var isEnglish: Boolean = false
     private var language: String = Constant.Language.ENGLISH
     private lateinit var unit: String
-
+    private var convertCelsiusMultiplayer = 1.0
+    private var convertCelsiusAddition = 0.0
+    private var isMeter :Boolean?=null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -62,6 +74,20 @@ class HomeFragment : Fragment() {
         }
         unit = (sharedPreferences.getString(Constant.TEMPERATURE_Unit, Constant.Units.CELSIUS))
             ?: Constant.Units.CELSIUS
+
+        isMeter = requireContext().getSharedPreferences("Setting", Context.MODE_PRIVATE)
+            .getBoolean(Constant.WIND_SPEED_UNIT, true)
+
+
+        when(unit){
+            Constant.Units.FAHRENHEIT-> {
+                convertCelsiusMultiplayer = 9.0 / 5.0
+                convertCelsiusAddition = 32.0
+            }
+            Constant.Units.KELVIN -> convertCelsiusAddition = 273.15
+        }
+
+
     }
 
     override fun onCreateView(
@@ -77,7 +103,7 @@ class HomeFragment : Fragment() {
         initializeUi()
 
         if (connectivityManager.activeNetworkInfo?.isConnected == true) {
-            getRefreshLocation()
+//            getRefreshLocation()
             lifecycleScope.launch {
                 viewModel.weatherStatus.collectLatest {
                     if (it.list.size > 0) {
@@ -87,13 +113,13 @@ class HomeFragment : Fragment() {
                 }
             }
         } else {
-            Snackbar.make(
-                view,
+            Toast.makeText(
+                requireContext(),
                 "Open Internet to get up to date Weather Status",
-                Snackbar.LENGTH_SHORT
+                Toast.LENGTH_SHORT
             ).show()
             viewModel.readDataFromFile(requireContext())
-            lifecycleScope.launch{
+            lifecycleScope.launch {
                 viewModel.weatherStatus.collectLatest {
                     if (it.list.size > 0) {
                         updateUi(it)
@@ -135,19 +161,40 @@ class HomeFragment : Fragment() {
         viewModel = ViewModelProvider(this, factory)[HomeViewModel::class.java]
         connectivityManager =
             requireContext().getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+    }
 
+    override fun onStart() {
+        super.onStart()
+        if (checkLocationPermission()) {
+            if (isLocationEnabled()) {
+                getRefreshLocation()
+            } else {
+                enableLocationServes()
+            }
+        } else {
+            ActivityCompat.requestPermissions(
+                requireActivity(),
+                arrayOf(
+                    Manifest.permission.ACCESS_COARSE_LOCATION,
+                    Manifest.permission.ACCESS_FINE_LOCATION
+                ),
+                REQUEST_LOCATION_CODE
+            )
+        }
     }
 
     @SuppressLint("SetTextI18n")
     private fun updateUi(root: Root) {
-
         setDailyListData(root.list)
         setNextDaysData(root.list)
         val dateFormat = SimpleDateFormat("EE, dd MMM", Locale.getDefault())
         val formattedDate = dateFormat.format(calendar.time)
         binding.tvTodayDate.text = formattedDate
         binding.tvCity.text = root.city?.name ?: "not found"
-        binding.flTvDegree.text = "${(root.list[0].main?.temp)?.toInt()} \u00B0"
+
+
+        val temperature = root.list[0].main?.temp ?:0.0
+        binding.flTvDegree.text = "${((temperature * convertCelsiusMultiplayer) + convertCelsiusAddition).toInt()}°"
         Glide.with(this)
             .load("https://openweathermap.org/img/wn/${root.list[0].weather[0].icon}@2x.png")
             .into(binding.flIvMainWeatherIcon)
@@ -163,10 +210,18 @@ class HomeFragment : Fragment() {
             binding.flTvCurrentTime.text = "12:${minute} am"
         }
         binding.tvHumidity.text = "${root.list[0].main?.humidity}%"
-        binding.tvWind.text = "${root.list[0].wind?.speed}m/s"
+
+        if (isMeter !=false){
+            binding.tvWind.text = "${root.list[0].wind?.speed}m/s"
+        }else{
+            binding.tvWind.text = "${(root.list[0].wind?.speed?.times(2.23694)?.toInt())}ml/h"
+        }
+
+
         binding.tvCloud.text = "${root.list[0].clouds?.all}%"
         binding.tvPressure.text = "${root.list[0].main?.pressure}pha"
     }
+
     @SuppressLint("MissingPermission")
     private fun getRefreshLocation() {
         fusedLocationProvider = LocationServices.getFusedLocationProviderClient(requireActivity())
@@ -181,6 +236,7 @@ class HomeFragment : Fragment() {
                     val lastLocation = locatioResult.lastLocation
                     val latitudeValue: Double = lastLocation?.latitude ?: 0.0
                     val longitudeValue: Double = lastLocation?.longitude ?: 0.0
+                    Log.i(TAG, "onLocationResult: ")
                     viewModel.getWeatherStatus(latitudeValue, longitudeValue, unit, language)
                     fusedLocationProvider.removeLocationUpdates(this)
                 }
@@ -188,5 +244,34 @@ class HomeFragment : Fragment() {
             Looper.myLooper()
 
         )
+    }
+
+    private fun checkLocationPermission(): Boolean {
+        var result = false
+        if ((ContextCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.ACCESS_FINE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED)
+            || (ContextCompat.checkSelfPermission(
+                requireContext(),
+                Manifest.permission.ACCESS_COARSE_LOCATION
+            ) == PackageManager.PERMISSION_GRANTED)
+        ) {
+            result = true
+        }
+        return result
+    }
+
+    private fun isLocationEnabled(): Boolean {
+        val locationManager: LocationManager =
+            requireContext().getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
+                || locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
+    }
+
+    private fun enableLocationServes() {
+        Toast.makeText(requireContext(), "open location", Toast.LENGTH_SHORT).show()
+        val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
+        startActivity(intent)
     }
 }

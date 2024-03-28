@@ -9,6 +9,12 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.weatherapplication.R
 import com.example.weatherapplication.model.FavouriteCountries
+import java.time.Instant
+import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+import java.util.Calendar
+import java.util.Date
 
 private const val TAG = "AlarmAdapter"
 class AlarmAdapter(private var dataSet: List<FavouriteCountries>) :
@@ -24,10 +30,25 @@ class AlarmAdapter(private var dataSet: List<FavouriteCountries>) :
         val currentItem = dataSet[position]
         currentItem.let {
             holder.tvTitle.text = it.cityName
-            holder.tvCoordinator.text="${it.latitude} , ${it.longitude}"
-            holder.tvTime.text=it.date
+            holder.tvCoordinator.text = "${it.latitude} , ${it.longitude}"
+
+            holder.tvTime.text="${millisecondsToFormattedDateTime(it.date.toLong())}"
         }
         holder.btnDelete.setOnClickListener { Log.i(TAG, "onBindViewHolder:  $currentItem") }
+    }
+
+    fun millisecondsToFormattedDateTime(milliseconds: Long): String {
+        val calendar = Calendar.getInstance().apply {
+            timeInMillis = milliseconds
+        }
+
+        val day = calendar.get(Calendar.DAY_OF_MONTH)
+        val month = calendar.get(Calendar.MONTH) + 1 // Months are zero-based
+        val year = calendar.get(Calendar.YEAR)
+        val hour = calendar.get(Calendar.HOUR_OF_DAY)
+        val minute = calendar.get(Calendar.MINUTE)
+
+        return String.format("%02d/%02d/%d : %02d/%d", day, month, year, hour, minute)
     }
 
     fun setData(newData: List<FavouriteCountries>) {
@@ -46,8 +67,8 @@ class AlarmAdapter(private var dataSet: List<FavouriteCountries>) :
         var btnDelete: Button
 
         init {
-            tvTitle = itemView.findViewById(R.id.tv_city_coord_alarm_item)
-            tvCoordinator = itemView.findViewById(R.id.tv_city_title_alarm_item)
+            tvTitle = itemView.findViewById(R.id.tv_city_title_alarm_item)
+            tvCoordinator = itemView.findViewById(R.id.tv_city_coord_alarm_item)
             tvTime = itemView.findViewById(R.id.tv_alarm_time_item)
             btnDelete = itemView.findViewById(R.id.btn_delete_alarm)
         }

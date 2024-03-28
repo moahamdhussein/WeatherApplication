@@ -1,15 +1,14 @@
 package com.example.weatherapplication.home
 
 import android.content.Context
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.example.weatherapplication.Constant
 import com.example.weatherapplication.R
 import com.example.weatherapplication.model.WeatherProperty
 
@@ -20,8 +19,20 @@ class DailyForecastAdapter(
     val context: Context
 
 ) : RecyclerView.Adapter<DailyForecastAdapter.ViewHolder>() {
-    var startTime: Int = 0
+    var convertCelsiusMultiplayer = 1.0
+    var convertCelsiusAddition = 0.0
+
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        val unit =  context.getSharedPreferences("Setting", Context.MODE_PRIVATE).getString(Constant.TEMPERATURE_Unit,Constant.Units.CELSIUS)
+
+        when(unit){
+            Constant.Units.FAHRENHEIT-> {
+                convertCelsiusMultiplayer = 9.0 / 5.0
+                convertCelsiusAddition = 32.0
+            }
+            Constant.Units.KELVIN -> convertCelsiusAddition = 273.15
+        }
+
         val inflater: LayoutInflater = LayoutInflater.from(parent.context)
         val view: View = inflater.inflate(R.layout.daily_forecast_item, parent, false)
         return ViewHolder(view)
@@ -30,8 +41,9 @@ class DailyForecastAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
 
+        val temperature = weatherProperty[position].main?.temp ?:0.0
 
-        holder.tvTemperature.text = "${(weatherProperty[position].main?.temp)?.toInt()}\u00B0"
+        holder.tvTemperature.text = "${((temperature * convertCelsiusMultiplayer) + convertCelsiusAddition).toInt()}\u00B0"
         val time = weatherProperty[position].dtTxt?.split(" ")?.get(1)?.substring(0,2)?.toInt() ?:0
         if (time > 12 ){
             holder.tvTime.text = "${time-12} pm"
@@ -52,7 +64,6 @@ class DailyForecastAdapter(
     fun setList(newWeatherProperty: MutableList<WeatherProperty>) {
 
         weatherProperty = newWeatherProperty
-        startTime = (weatherProperty[0].dtTxt?.split(" ")?.get(1)?.split(":")?.get(0))?.toInt() ?: 0
         notifyDataSetChanged()
     }
 

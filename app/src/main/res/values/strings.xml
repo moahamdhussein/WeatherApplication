@@ -17,4 +17,9 @@
     <string name="mile_hour">Mile / Hour</string>
     <string name="save">save</string>
     <string name="today">Today</string>
+    <string name="updatelocation">Update Location</string>
+    <string name="home">Home</string>
+    <string name="favourite">Favourite</string>
+    <string name="alarm">Alarm</string>
+    <string name="settings">Settings</string>
 </resources>

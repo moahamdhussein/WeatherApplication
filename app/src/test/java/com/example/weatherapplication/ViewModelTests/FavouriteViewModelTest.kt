@@ -3,25 +3,22 @@ package com.example.weatherapplication.ViewModelTests
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.example.weatherapplication.MainCoroutineRule
 import com.example.weatherapplication.alarm.AlarmViewModel
-import com.example.weatherapplication.home.HomeViewModel
+import com.example.weatherapplication.favouriteList.FavouriteViewModel
 import com.example.weatherapplication.model.FavouriteCountries
 import com.example.weatherapplication.repoTests.FakeRepo
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
-import org.hamcrest.CoreMatchers
 import org.hamcrest.MatcherAssert
-import org.hamcrest.MatcherAssert.assertThat
-import org.hamcrest.Matchers.`is`
+import org.hamcrest.Matchers
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
-
 @RunWith(AndroidJUnit4::class)
-class AlarmViewModel {
+class FavouriteViewModelTest {
 
-    lateinit var viewModel: AlarmViewModel
+    lateinit var viewModel: FavouriteViewModel
     lateinit var repo: FakeRepo
 
     @get:Rule
@@ -30,35 +27,38 @@ class AlarmViewModel {
     @Before
     fun setUp() {
         repo = FakeRepo()
-        viewModel = AlarmViewModel(repo)
+        viewModel = FavouriteViewModel(repo)
     }
 
     @Test
     fun GetAllAlarmTest() = runTest {
         // given add inputs to fake repo to test
-        val alarmCountry = FavouriteCountries(0.0, 0.0, "test", "Alarm", "2020", 0)
-        repo.insertFavouriteCountry(alarmCountry)
+        val favouriteCountries = FavouriteCountries(0.0, 0.0, "test", "Favourite", "2020", 0)
+        repo.insertFavouriteCountry(favouriteCountries)
 
 
         // when we call weatherStatus the return will be first item list the contain list from database
         val result = viewModel.weatherStatus.first()
 
-        assertThat(result.contains(alarmCountry), `is`(true))
-        assertThat(result[0].alarmId,`is`(0))
-        assertThat(result[0].type == "Alarm",`is`(true))
+        // then the result should bbe the same to the input and matches every element
+        MatcherAssert.assertThat(result.contains(favouriteCountries), Matchers.`is`(true))
+        MatcherAssert.assertThat(result[0].alarmId, Matchers.`is`(0))
+        MatcherAssert.assertThat(result[0].type == "Favourite", Matchers.`is`(true))
 
     }
     @Test
     fun DeleteAlarmItemTest() = runTest {
         // given add inputs to fake repo to test
-        val alarmCountry = FavouriteCountries(0.0, 0.0, "test", "Alarm", "2020", 0)
-        repo.insertFavouriteCountry(alarmCountry)
+        val favouriteCountry = FavouriteCountries(0.0, 0.0, "test", "Favourite", "2020", 0)
+
+        repo.insertFavouriteCountry(favouriteCountry)
 
         // when we call weatherStatus the return will be first item list the contain list from database
-         viewModel.deleteAlarmItem(alarmCountry)
+        viewModel.deleteFavouriteCountry(favouriteCountry)
 
         //then the result should be not contain the input
         val result = viewModel.weatherStatus.first()
-        assertThat(result.contains(alarmCountry), `is`(false))
+        MatcherAssert.assertThat(result.contains(favouriteCountry), Matchers.`is`(false))
     }
+
 }

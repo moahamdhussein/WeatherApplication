@@ -5,20 +5,20 @@
         <item
             android:id="@+id/homeFragment2"
             android:icon="@drawable/home"
-            android:title="Home" />
+            android:title="@string/home" />
         <item
             android:id="@+id/favouriteFragment"
             android:icon="@drawable/favorite_outline"
-            android:title="Favourite" />
+            android:title="@string/favourite" />
         <item
             android:id="@+id/alarmFragment"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:icon="@drawable/alarm_add"
-            android:title="Alarm" />
+            android:title="@string/alarm" />
         <item
             android:id="@+id/settingFragment"
-            android:title="Settings"
+            android:title="@string/settings"
             android:icon="@drawable/settings_icon"/>
     </group>
 

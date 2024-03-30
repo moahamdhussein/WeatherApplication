@@ -82,11 +82,9 @@ class FavouriteFragment : Fragment(), IFavouriteFragment {
                 )
         }
     }
-
     override fun deleteItem(favouriteCountries: FavouriteCountries) {
         viewModel.deleteFavouriteCountry(favouriteCountries)
     }
-
     override fun onItemClick(favouriteCountries: FavouriteCountries) {
         val action =FavouriteFragmentDirections.actionFavouriteFragmentToHomeFragment2("${favouriteCountries.longitude}","${favouriteCountries.latitude}")
         Navigation.findNavController(binding.root)
@@ -94,6 +92,4 @@ class FavouriteFragment : Fragment(), IFavouriteFragment {
                 action
             )
     }
-
-
 }

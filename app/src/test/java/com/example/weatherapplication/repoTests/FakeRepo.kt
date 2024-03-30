@@ -1,8 +1,13 @@
 package com.example.weatherapplication.repoTests
 
 import android.util.Log
+import com.example.weatherapplication.model.City
 import com.example.weatherapplication.model.FavouriteCountries
 import com.example.weatherapplication.model.Root
+import com.example.weatherapplication.model.Sys
+import com.example.weatherapplication.model.Weather
+import com.example.weatherapplication.model.WeatherProperty
+import com.example.weatherapplication.model.Wind
 import com.example.weatherapplication.repository.IWeatherRepository
 import com.example.weatherapplication.utility.ApiState
 import kotlinx.coroutines.flow.Flow
@@ -21,7 +26,34 @@ class FakeRepo : IWeatherRepository {
         lat: Double,
         lon: Double,
         language: String
-    ): Flow<Response<Root>>  = flow {  emit(Response.success(Root()))}
+
+    ): Flow<Response<Root>> {
+        val root = Root()
+        root.city.let {
+            it?.id=12332
+            it?.name = "alex"
+            it?.coord?.lat = 0.0
+            it?.coord?.lon = 0.0
+            it?.country="Egypt"
+            it?.population=100
+            it?.timezone=100
+            it?.sunrise=100
+            it?.sunset=100
+        }
+        root.cod = "code"
+        root.message = 200
+        root.cnt = 200
+        val weatherProperty = WeatherProperty()
+        weatherProperty.let {
+            it.weather = arrayListOf()
+            it.visibility=1
+            it.wind= Wind()
+            it.sys = Sys()
+
+        }
+        root.list = mutableListOf(WeatherProperty())
+        return flow {  emit(Response.success(root))}
+    }
 
 
     override suspend fun getFavouriteCountries(): Flow<List<FavouriteCountries>> {

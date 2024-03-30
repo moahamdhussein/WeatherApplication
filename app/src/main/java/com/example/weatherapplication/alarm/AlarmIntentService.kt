@@ -35,19 +35,23 @@ class AlarmIntentService : IntentService("AlarmIntentService"), CoroutineScope b
             WeatherLocalDataSource(WeatherDatabase.getInstance(this).getFavouriteDao())
         )
     }
+
     @Deprecated("Deprecated in Java")
     override fun onHandleIntent(intent: Intent?) {
         val isEnglish = getSharedPreferences("Setting", Context.MODE_PRIVATE)
             .getBoolean(Constant.LANGUAGE_KEY, true)
         val language: String = if (isEnglish) "en" else "ar"
         Log.i(TAG, "onHandleIntent: test")
+        val lat: Double = intent?.getDoubleExtra("lat", 0.0) ?: 0.0
+        val lon: Double = intent?.getDoubleExtra("lon", 0.0) ?: 0.0
         launch(Dispatchers.IO) {
-            repo.getWeatherDetails(30.3000, 30.132132, language).collectLatest {
+            repo.getWeatherDetails(lat, lon, language).collectLatest {
                 it.body().let { root ->
                     showNotification(
                         this@AlarmIntentService,
-                        "${root?.list?.get(0)?.main?.temp ?: " not found"}",
-                        root?.list?.get(0)?.weather?.get(0)?.description ?: " not found"
+                        "city name${root?.city?.name}",
+                        "weather description : ${root?.list?.get(0)?.weather?.get(0)?.description ?: " not found"} and temperature = " +
+                                "${root?.list?.get(0)?.main?.temp ?: " not found"}"
                     )
                 }
             }
@@ -56,18 +60,22 @@ class AlarmIntentService : IntentService("AlarmIntentService"), CoroutineScope b
 
 }
 
-private fun showNotification(context: Context, title: String, message: String) /*: NotificationCompat.Builder*/ {
+private fun showNotification(
+    context: Context,
+    title: String,
+    message: String
+) /*: NotificationCompat.Builder*/ {
 
     val activityIntent = Intent(context, MainActivity::class.java)
-    val pendingIntent = PendingIntent.getActivity(context, 0, activityIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+    val pendingIntent =
+        PendingIntent.getActivity(context, 0, activityIntent, PendingIntent.FLAG_UPDATE_CURRENT)
     val builder: NotificationCompat.Builder = NotificationCompat.Builder(context, "channel_id")
-        .setSmallIcon(R.drawable.ic_launcher_foreground)
-
+        .setSmallIcon(R.drawable.alarm_add)
         .setContentTitle(title)
         .setContentText(message)
         .setPriority(NotificationCompat.PRIORITY_HIGH)
         .setVisibility(NotificationCompat.VISIBILITY_PUBLIC)
-        .setContentIntent(pendingIntent)
+        .setBadgeIconType(NotificationCompat.BADGE_ICON_LARGE)
 
 
     val notificationManager = NotificationManagerCompat.from(context)

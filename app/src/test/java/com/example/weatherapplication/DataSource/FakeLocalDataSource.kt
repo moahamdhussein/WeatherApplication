@@ -5,7 +5,7 @@ import com.example.weatherapplication.model.FavouriteCountries
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 
-class FakeLocalDataSource :IWeatherLocalDataSource{
+class FakeLocalDataSource() :IWeatherLocalDataSource{
 
     private val localDataSource :MutableList<FavouriteCountries> = mutableListOf()
     private val stateData:MutableStateFlow<List<FavouriteCountries>> =  MutableStateFlow(listOf())

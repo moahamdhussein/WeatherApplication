@@ -129,5 +129,8 @@ dependencies {
     // lottie
     implementation("com.airbnb.android:lottie:6.3.0")
 
+    // weather View
+    implementation("com.github.MatteoBattilana:WeatherView:3.0.0")
+
 
 }

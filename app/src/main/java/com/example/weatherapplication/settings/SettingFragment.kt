@@ -9,6 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.app.ActivityCompat.recreate
+import androidx.navigation.Navigation
 import com.example.weatherapplication.utility.Constant
 import com.example.weatherapplication.databinding.FragmentSettingBinding
 
@@ -40,16 +41,24 @@ class SettingFragment : Fragment() {
             recreate(requireActivity())
         }
     }
+
     private fun initialization() {
         sharedPreferences = requireContext().getSharedPreferences("Setting", Context.MODE_PRIVATE)
         editor = sharedPreferences.edit()
         isEnglish = sharedPreferences.getBoolean(Constant.LANGUAGE_KEY, true)
         isGps = sharedPreferences.getBoolean(Constant.LOCATION_KEY, true)
         isMetric = sharedPreferences.getBoolean(Constant.WIND_SPEED_UNIT, true)
-        tempUnit = sharedPreferences.getString(Constant.TEMPERATURE_Unit, Constant.Units.CELSIUS) ?: Constant.Units.CELSIUS
+        tempUnit = sharedPreferences.getString(Constant.TEMPERATURE_Unit, Constant.Units.CELSIUS)
+            ?: Constant.Units.CELSIUS
+        binding.btnChangeMainLocation.setOnClickListener {
+            Navigation.findNavController(binding.root).navigate(
+                SettingFragmentDirections.actionSettingFragmentToMapFragment("changeMainLocation","-")
+            )
+        }
     }
 
     private fun getCheckedButton() {
+
         if (isEnglish) {
             binding.radioEnglish.isChecked = true
         } else {
@@ -63,6 +72,7 @@ class SettingFragment : Fragment() {
         if (isGps) {
             binding.radioGps.isChecked = true
         } else {
+            binding.btnChangeMainLocation.visibility = View.VISIBLE
             binding.radioMap.isChecked = true
         }
         when (tempUnit) {

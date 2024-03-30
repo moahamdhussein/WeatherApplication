@@ -7,237 +7,251 @@
     android:background="#0b0c1e"
     tools:context=".home.HomeFragment">
 
-
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="0dp">
+        <com.github.matteobattilana.weather.WeatherView
+            android:id="@+id/weather_background"
+            android:layout_width="400dp"
+            android:layout_height="match_parent"
+            android:visibility="visible"
 
-        <TextView
-            android:id="@+id/tv_today_date"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="10dp"
-            android:layout_marginTop="16dp"
-            android:fontFamily="@font/roboto_bold"
-            android:textColor="@color/white"
-            android:textSize="14sp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            tools:text="Today, 17-03-2024" />
-
-        <ImageView
-            android:id="@+id/location_icon"
-            android:layout_width="16dp"
-            android:layout_height="20dp"
-            android:layout_marginStart="10dp"
-            android:layout_marginTop="5dp"
-            android:src="@drawable/location_icon"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_today_date" />
-
-        <TextView
-            android:id="@+id/tv_city"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="5dp"
-            android:layout_marginTop="5dp"
-            android:textColor="#818181"
-            app:layout_constraintStart_toEndOf="@id/location_icon"
-            app:layout_constraintTop_toBottomOf="@id/tv_today_date"
-            tools:text="Cairo" />
-
-        <FrameLayout
-            android:id="@+id/fl_main_view"
-            android:layout_width="match_parent"
-            android:layout_height="250dp"
-            android:layout_marginTop="70dp"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"/>
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/tv_today_date"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="16dp"
+                android:fontFamily="@font/roboto_bold"
+                android:textColor="@color/white"
+                android:textSize="14sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                tools:text="Today, 17-03-2024" />
 
             <ImageView
-                android:id="@+id/fl_iv_main_weather_icon"
-                android:layout_width="match_parent"
-                android:layout_height="180dp"
-                android:layout_gravity="top"
-                android:src="@drawable/sunny" />
+                android:id="@+id/location_icon"
+                android:layout_width="16dp"
+                android:layout_height="20dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="5dp"
+                android:src="@drawable/location_icon"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_today_date" />
 
             <TextView
-                android:id="@+id/fl_tv_degree"
-                android:layout_width="match_parent"
+                android:id="@+id/tv_city"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_vertical|bottom"
-                android:layout_marginStart="30dp"
-                android:layout_marginBottom="30dp"
+                android:layout_marginStart="5dp"
+                android:layout_marginTop="5dp"
+                android:textColor="#818181"
+                app:layout_constraintStart_toEndOf="@id/location_icon"
+                app:layout_constraintTop_toBottomOf="@id/tv_today_date"
+                tools:text="Cairo" />
+
+            <FrameLayout
+                android:id="@+id/fl_main_view"
+                android:layout_width="match_parent"
+                android:layout_height="250dp"
+                android:layout_marginTop="70dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+
+                <ImageView
+                    android:id="@+id/fl_iv_main_weather_icon"
+                    android:layout_width="match_parent"
+                    android:layout_height="180dp"
+                    android:layout_gravity="top"
+                    android:src="@drawable/sunny" />
+
+                <TextView
+                    android:id="@+id/fl_tv_degree"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_vertical|bottom"
+                    android:layout_marginStart="30dp"
+                    android:layout_marginBottom="30dp"
+                    android:fontFamily="@font/roboto_bold"
+                    android:gravity="center"
+                    android:textColor="#CED1CF"
+                    android:textSize="100sp"
+                    tools:text="24\u00B0" />
+
+                <TextView
+                    android:id="@+id/fl_tv_weather_description"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom"
+                    android:layout_marginBottom="25dp"
+                    android:gravity="center"
+                    android:textColor="@color/white"
+                    android:textSize="22sp"
+                    tools:text="Sunny" />
+
+                <TextView
+                    android:id="@+id/fl_tv_current_time"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="bottom"
+                    android:layout_marginTop="5dp"
+                    android:gravity="center"
+                    android:textColor="#818181"
+                    android:textSize="18sp"
+                    tools:text="13:54:20" />
+            </FrameLayout>
+
+
+            <ImageView
+                android:id="@+id/humidity_icon"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:layout_marginStart="10dp"
+                android:layout_marginTop="20dp"
+                android:src="@drawable/humidity"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/fl_main_view" />
+
+            <TextView
+                android:id="@+id/tv_humidity"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:layout_marginTop="20dp"
+                android:layout_weight="1"
                 android:fontFamily="@font/roboto_bold"
-                android:gravity="center"
-                android:textColor="#CED1CF"
-                android:textSize="100sp"
-                tools:text="24\u00B0" />
+                android:textColor="#B8B7B7"
+                android:textSize="18sp"
+                app:layout_constraintStart_toEndOf="@id/humidity_icon"
+                app:layout_constraintTop_toBottomOf="@id/fl_main_view"
+                tools:text="51%" />
+
+            <ImageView
+                android:id="@+id/wind_icon"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:layout_marginStart="25dp"
+                android:layout_marginTop="20dp"
+                android:src="@drawable/wind_speed"
+                app:layout_constraintStart_toEndOf="@id/tv_humidity"
+                app:layout_constraintTop_toBottomOf="@id/fl_main_view" />
 
             <TextView
-                android:id="@+id/fl_tv_weather_description"
-                android:layout_width="match_parent"
+                android:id="@+id/tv_wind"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="bottom"
-                android:layout_marginBottom="25dp"
-                android:gravity="center"
+                android:layout_marginStart="5dp"
+                android:layout_marginTop="20dp"
+                android:layout_weight="1"
+                android:fontFamily="@font/roboto_bold"
+                android:textColor="#B8B7B7"
+                android:textSize="18sp"
+                app:layout_constraintStart_toEndOf="@id/wind_icon"
+                app:layout_constraintTop_toBottomOf="@id/fl_main_view"
+                tools:text="5km/h" />
+
+            <ImageView
+                android:id="@+id/cloud_icon"
+                android:layout_width="22dp"
+                android:layout_height="22dp"
+                android:layout_marginStart="25dp"
+                android:layout_marginTop="20dp"
+                android:src="@drawable/cloud"
+                app:layout_constraintStart_toEndOf="@id/tv_wind"
+                app:layout_constraintTop_toBottomOf="@id/fl_main_view" />
+
+            <TextView
+                android:id="@+id/tv_cloud"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:layout_marginTop="20dp"
+                android:layout_weight="1"
+                android:fontFamily="@font/roboto_bold"
+                android:textColor="#B8B7B7"
+                android:textSize="18sp"
+                app:layout_constraintStart_toEndOf="@id/cloud_icon"
+                app:layout_constraintTop_toBottomOf="@id/fl_main_view"
+                tools:text="90 %" />
+
+            <ImageView
+                android:id="@+id/pressure_icon"
+                android:layout_width="20dp"
+                android:layout_height="22dp"
+                android:layout_marginStart="15dp"
+                android:layout_marginTop="20dp"
+                android:src="@drawable/pressure"
+                app:layout_constraintStart_toEndOf="@id/tv_cloud"
+                app:layout_constraintTop_toBottomOf="@id/fl_main_view" />
+
+            <TextView
+                android:id="@+id/tv_pressure"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="5dp"
+                android:layout_marginTop="20dp"
+                android:layout_weight="1"
+                android:fontFamily="@font/roboto_bold"
+                android:textColor="#B8B7B7"
+                android:textSize="18sp"
+                app:layout_constraintStart_toEndOf="@id/pressure_icon"
+                app:layout_constraintTop_toBottomOf="@id/fl_main_view"
+                tools:text="1018 hba" />
+
+            <TextView
+                android:id="@+id/tv_daily_forecast_title"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="15dp"
+                android:text="@string/daily_forecast"
                 android:textColor="@color/white"
                 android:textSize="22sp"
-                tools:text="Sunny" />
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_humidity" />
 
-            <TextView
-                android:id="@+id/fl_tv_current_time"
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_daily_forecast"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="bottom"
-                android:layout_marginTop="5dp"
-                android:gravity="center"
-                android:textColor="#818181"
-                android:textSize="18sp"
-                tools:text="13:54:20" />
-        </FrameLayout>
+                android:layout_marginTop="15dp"
+                android:orientation="horizontal"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/tv_daily_forecast_title"
+                tools:listitem="@layout/daily_forecast_item" />
 
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rv_next_days"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="15dp"
+                android:orientation="vertical"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/rv_daily_forecast"
+                tools:listitem="@layout/next_days_item" />
 
-        <ImageView
-            android:id="@+id/humidity_icon"
-            android:layout_width="22dp"
-            android:layout_height="22dp"
-            android:layout_marginStart="10dp"
-            android:layout_marginTop="20dp"
-            android:src="@drawable/humidity"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/fl_main_view" />
+            <com.airbnb.lottie.LottieAnimationView
+                android:id="@+id/loading_animation"
+                android:layout_width="match_parent"
+                android:layout_height="750dp"
+                app:lottie_rawRes="@raw/loading"
+                app:lottie_autoPlay="true"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"/>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </FrameLayout>
 
-        <TextView
-            android:id="@+id/tv_humidity"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="5dp"
-            android:layout_marginTop="20dp"
-            android:layout_weight="1"
-            android:fontFamily="@font/roboto_bold"
-            android:textColor="#B8B7B7"
-            android:textSize="18sp"
-            app:layout_constraintStart_toEndOf="@id/humidity_icon"
-            app:layout_constraintTop_toBottomOf="@id/fl_main_view"
-            tools:text="51%" />
-
-        <ImageView
-            android:id="@+id/wind_icon"
-            android:layout_width="22dp"
-            android:layout_height="22dp"
-            android:layout_marginStart="25dp"
-            android:layout_marginTop="20dp"
-            android:src="@drawable/wind_speed"
-            app:layout_constraintStart_toEndOf="@id/tv_humidity"
-            app:layout_constraintTop_toBottomOf="@id/fl_main_view" />
-
-        <TextView
-            android:id="@+id/tv_wind"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="5dp"
-            android:layout_marginTop="20dp"
-            android:layout_weight="1"
-            android:fontFamily="@font/roboto_bold"
-            android:textColor="#B8B7B7"
-            android:textSize="18sp"
-            app:layout_constraintStart_toEndOf="@id/wind_icon"
-            app:layout_constraintTop_toBottomOf="@id/fl_main_view"
-            tools:text="5km/h" />
-
-        <ImageView
-            android:id="@+id/cloud_icon"
-            android:layout_width="22dp"
-            android:layout_height="22dp"
-            android:layout_marginStart="25dp"
-            android:layout_marginTop="20dp"
-            android:src="@drawable/cloud"
-            app:layout_constraintStart_toEndOf="@id/tv_wind"
-            app:layout_constraintTop_toBottomOf="@id/fl_main_view" />
-
-        <TextView
-            android:id="@+id/tv_cloud"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="5dp"
-            android:layout_marginTop="20dp"
-            android:layout_weight="1"
-            android:fontFamily="@font/roboto_bold"
-            android:textColor="#B8B7B7"
-            android:textSize="18sp"
-            app:layout_constraintStart_toEndOf="@id/cloud_icon"
-            app:layout_constraintTop_toBottomOf="@id/fl_main_view"
-            tools:text="90 %" />
-
-        <ImageView
-            android:id="@+id/pressure_icon"
-            android:layout_width="22dp"
-            android:layout_height="22dp"
-            android:layout_marginStart="25dp"
-            android:layout_marginTop="20dp"
-            android:src="@drawable/pressure"
-            app:layout_constraintStart_toEndOf="@id/tv_cloud"
-            app:layout_constraintTop_toBottomOf="@id/fl_main_view" />
-
-        <TextView
-            android:id="@+id/tv_pressure"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="5dp"
-            android:layout_marginTop="20dp"
-            android:layout_weight="1"
-            android:fontFamily="@font/roboto_bold"
-            android:textColor="#B8B7B7"
-            android:textSize="18sp"
-            app:layout_constraintStart_toEndOf="@id/pressure_icon"
-            app:layout_constraintTop_toBottomOf="@id/fl_main_view"
-            tools:text="1018 hba" />
-
-        <TextView
-            android:id="@+id/tv_daily_forecast_title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="15dp"
-            android:text="@string/daily_forecast"
-            android:textColor="@color/white"
-            android:textSize="22sp"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_humidity" />
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rv_daily_forecast"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="15dp"
-            android:orientation="horizontal"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/tv_daily_forecast_title"
-            tools:listitem="@layout/daily_forecast_item" />
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/rv_next_days"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="15dp"
-            android:orientation="vertical"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/rv_daily_forecast"
-            tools:listitem="@layout/next_days_item" />
-        <com.airbnb.lottie.LottieAnimationView
-            android:id="@+id/loading_animation"
-            android:layout_width="match_parent"
-            android:layout_height="750dp"
-            android:background="#0b0c1e"
-            app:lottie_rawRes="@raw/loading"
-            app:lottie_autoPlay="true"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"/>
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>

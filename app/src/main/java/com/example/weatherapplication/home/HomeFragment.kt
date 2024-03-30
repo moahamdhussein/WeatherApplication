@@ -33,6 +33,8 @@ import com.example.weatherapplication.model.WeatherProperty
 import com.example.weatherapplication.remoteDataSource.WeatherRemoteDataSource
 import com.example.weatherapplication.repository.WeatherRepository
 import com.example.weatherapplication.utility.ApiState
+import com.github.matteobattilana.weather.PrecipType
+import com.github.matteobattilana.weather.WeatherData
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
@@ -69,10 +71,12 @@ class HomeFragment : Fragment() {
     private var isMeter: Boolean? = null
     private var lat: String? = null
     private var longtuide: String? = null
+    private var isGps: Boolean? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         sharedPreferences = requireContext().getSharedPreferences("Setting", Context.MODE_PRIVATE)
         isEnglish = sharedPreferences.getBoolean(Constant.LANGUAGE_KEY, true)
         if (!isEnglish) {
@@ -81,8 +85,7 @@ class HomeFragment : Fragment() {
         unit = (sharedPreferences.getString(Constant.TEMPERATURE_Unit, Constant.Units.CELSIUS))
             ?: Constant.Units.CELSIUS
 
-        isMeter = requireContext().getSharedPreferences("Setting", Context.MODE_PRIVATE)
-            .getBoolean(Constant.WIND_SPEED_UNIT, true)
+        isMeter = sharedPreferences.getBoolean(Constant.WIND_SPEED_UNIT, true)
 
 
         when (unit) {
@@ -94,7 +97,7 @@ class HomeFragment : Fragment() {
             Constant.Units.KELVIN -> convertCelsiusAddition = 273.15
         }
 
-
+        isGps = sharedPreferences.getBoolean(Constant.LOCATION_KEY,true)
     }
 
     override fun onCreateView(
@@ -113,7 +116,18 @@ class HomeFragment : Fragment() {
 
         if (connectivityManager.activeNetworkInfo?.isConnected == true) {
             if (longtuide.equals("notFound", true) && lat.equals("notFound", true)) {
-                getRefreshLocation()
+                if (isGps == true){
+                    if (isLocationEnabled()){
+                    getRefreshLocation()
+                    }else{
+                        enableLocationServes()
+                    }
+                }else{
+                    val lat = sharedPreferences.getString("mainLat","30.00000")?.toDouble() ?:0.0
+                    val lon =sharedPreferences.getString("mainLon","32.0000")?.toDouble() ?: 0.0
+                    viewModel.getWeatherStatus(lat,lon,language)
+                }
+
                 lifecycleScope.launch(Dispatchers.IO) {
                     viewModel.weatherStatus.collectLatest {
                         launch(Dispatchers.Main) {
@@ -165,12 +179,6 @@ class HomeFragment : Fragment() {
             viewModel.readDataFromFile(requireContext())
             lifecycleScope.launch(Dispatchers.IO) {
                 viewModel.weatherStatus.collectLatest {
-//                    if (it.list.size > 0) {
-//                        launch(Dispatchers.Main) {
-//
-//                            updateUi(it)
-//                        }
-//                    }
                     launch(Dispatchers.Main) {
                         when (it) {
                             is ApiState.Success -> {
@@ -224,28 +232,14 @@ class HomeFragment : Fragment() {
             )
         )
         viewModel = ViewModelProvider(this, factory)[HomeViewModel::class.java]
+
         connectivityManager =
             requireContext().getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
     }
 
     override fun onStart() {
         super.onStart()
-        if (checkLocationPermission()) {
-            if (isLocationEnabled()) {
 
-            } else {
-                enableLocationServes()
-            }
-        } else {
-            ActivityCompat.requestPermissions(
-                requireActivity(),
-                arrayOf(
-                    Manifest.permission.ACCESS_COARSE_LOCATION,
-                    Manifest.permission.ACCESS_FINE_LOCATION
-                ),
-                REQUEST_LOCATION_CODE
-            )
-        }
     }
 
     @SuppressLint("SetTextI18n")
@@ -284,6 +278,16 @@ class HomeFragment : Fragment() {
         } else {
             binding.tvWind.text = "${(root.list[0].wind?.speed?.times(2.23694)?.toInt())}ml/h"
         }
+        if (root.list[0].weather[0].main?.equals("Clear",ignoreCase = true) ==true){
+            binding.weatherBackground.setWeatherData(PrecipType.CLEAR)
+        }else if (root.list[0].weather[0].main?.equals("snow",ignoreCase = true) ==true){
+            binding.weatherBackground.setWeatherData(PrecipType.SNOW)
+        }else if (root.list[0].weather[0].main?.equals("rain",ignoreCase = true) ==true){
+            binding.weatherBackground.setWeatherData(PrecipType.RAIN)
+            Log.i(TAG, "updateUi: rain")
+        }else{
+            binding.weatherBackground.setWeatherData(PrecipType.CLEAR)
+        }
 
 
         binding.tvCloud.text = "${root.list[0].clouds?.all}%"
@@ -291,7 +295,7 @@ class HomeFragment : Fragment() {
     }
 
 
-    fun changeVisibility(visibilityState :Int){
+    private fun changeVisibility(visibilityState: Int) {
 
         binding.tvTodayDate.visibility = visibilityState
         binding.locationIcon.visibility = visibilityState
@@ -303,12 +307,11 @@ class HomeFragment : Fragment() {
         binding.tvWind.visibility = visibilityState
         binding.cloudIcon.visibility = visibilityState
         binding.tvCloud.visibility = visibilityState
-        binding.pressureIcon.visibility=visibilityState
-        binding.tvPressure.visibility=visibilityState
+        binding.pressureIcon.visibility = visibilityState
+        binding.tvPressure.visibility = visibilityState
         binding.tvDailyForecastTitle.visibility = visibilityState
         binding.rvDailyForecast.visibility = visibilityState
         binding.rvNextDays.visibility = visibilityState
-
 
 
     }
@@ -337,32 +340,17 @@ class HomeFragment : Fragment() {
         )
     }
 
-    private fun checkLocationPermission(): Boolean {
-        var result = false
-        if ((ContextCompat.checkSelfPermission(
-                requireContext(),
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) == PackageManager.PERMISSION_GRANTED)
-            || (ContextCompat.checkSelfPermission(
-                requireContext(),
-                Manifest.permission.ACCESS_COARSE_LOCATION
-            ) == PackageManager.PERMISSION_GRANTED)
-        ) {
-            result = true
-        }
-        return result
-    }
-
+    
     private fun isLocationEnabled(): Boolean {
         val locationManager: LocationManager =
             requireContext().getSystemService(Context.LOCATION_SERVICE) as LocationManager
         return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)
                 || locationManager.isProviderEnabled(LocationManager.NETWORK_PROVIDER)
     }
-
     private fun enableLocationServes() {
         Toast.makeText(requireContext(), "open location", Toast.LENGTH_SHORT).show()
         val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
         startActivity(intent)
+        getRefreshLocation()
     }
 }

@@ -7,6 +7,7 @@ import android.content.Context
 import android.content.Intent
 import android.location.Address
 import android.location.Geocoder
+import android.net.ConnectivityManager
 import android.os.Bundle
 import android.preference.PreferenceManager
 import android.util.Log
@@ -75,8 +76,6 @@ class MapFragment : Fragment() {
         animateToUserLocation()
         updateLocationOverlay()
         binding.btnSaveLocation.setOnClickListener { onSaveClick() }
-
-
     }
 
 
@@ -160,22 +159,31 @@ class MapFragment : Fragment() {
             val selectedLocation = selectedLocationMarker.position
             val lat = selectedLocation.latitude
             val long = selectedLocation.longitude
-            val cityName = getAddressFromLocation(lat, long)
-            var alarmId = Int.MIN_VALUE
-            if (type == "Alarm") {
-                alarmId = (1..250).random()
-                scheduleAlarm(requireContext(), date.toLong(), alarmId)
-            }
-            viewModel.insertFavourite(
-                FavouriteCountries(
-                    long,
-                    lat,
-                    cityName,
-                    type,
-                    date,
-                    alarmId
+            if (type == "changeMainLocation") {
+                val sharedPreferences =
+                    requireContext().getSharedPreferences("Setting", Context.MODE_PRIVATE)
+                val editor = sharedPreferences.edit()
+                editor.putString("mainLat", "$lat")
+                editor.putString("mainLon", "$long")
+                editor.apply()
+            } else {
+                val cityName = getAddressFromLocation(lat, long)
+                var alarmId = Int.MIN_VALUE
+                if (type == "Alarm") {
+                    alarmId = (1..250).random()
+                    scheduleAlarm(requireContext(), date.toLong(), alarmId, lat, long)
+                }
+                viewModel.insertFavourite(
+                    FavouriteCountries(
+                        long,
+                        lat,
+                        cityName,
+                        type,
+                        date,
+                        alarmId
+                    )
                 )
-            )
+            }
             Navigation.findNavController(binding.root).popBackStack()
         } else {
 
@@ -190,6 +198,11 @@ class MapFragment : Fragment() {
     }
 
     fun getAddressFromLocation(latitude: Double, longitude: Double): String {
+        val connectivityManager =
+            requireContext().getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+        if (connectivityManager.activeNetworkInfo?.isConnected == false) {
+            return "no internet to get city name"
+        }
         val geocoder = Geocoder(requireContext())
         val addresses: List<Address>? = geocoder.getFromLocation(latitude, longitude, 1)
         val cityName = addresses?.get(0)?.adminArea
@@ -197,13 +210,22 @@ class MapFragment : Fragment() {
         return "${cityName?.split("G", "g")?.get(0) ?: ""} $countryName"
     }
 
-    fun scheduleAlarm(context: Context, triggerAtMillis: Long, alarmId: Int) {
+    fun scheduleAlarm(
+        context: Context,
+        triggerAtMillis: Long,
+        alarmId: Int,
+        lat: Double,
+        lon: Double
+    ) {
         val alarmManager = context.getSystemService(AppCompatActivity.ALARM_SERVICE) as AlarmManager
         val intent = Intent(context, AlarmReceiver::class.java)
+        intent.putExtra("lat", lat)
+        intent.putExtra("lon", lon)
         val pendingIntent = PendingIntent.getBroadcast(
             context, alarmId, intent,
             PendingIntent.FLAG_IMMUTABLE
         )
+
         alarmManager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAtMillis, pendingIntent)
     }
 }

@@ -1,11 +1,14 @@
 package com.example.weatherapplication.favouriteList
 
+import android.content.Context
+import android.net.ConnectivityManager
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.Navigation
@@ -30,6 +33,7 @@ class FavouriteFragment : Fragment(), IFavouriteFragment {
     private lateinit var viewModel: FavouriteViewModel
     private lateinit var layoutManager: LinearLayoutManager
     private lateinit var favouriteAdapter: FavouriteAdapter
+    private lateinit var connectivityManager: ConnectivityManager
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -41,7 +45,8 @@ class FavouriteFragment : Fragment(), IFavouriteFragment {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+        connectivityManager =
+            requireContext().getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         factory = FavouriteViewModelFactory(
             repo = WeatherRepository.getInstance(
                 WeatherRemoteDataSource.getInstance(),
@@ -72,24 +77,44 @@ class FavouriteFragment : Fragment(), IFavouriteFragment {
         favouriteAdapter = FavouriteAdapter(listOf(), this)
         binding.rvFavouriteList.adapter = favouriteAdapter
         binding.fabAddToFavourite.setOnClickListener {
-            Log.i(TAG, "initializeUi: ")
-            Navigation.findNavController(binding.root)
-                .navigate(
-                    FavouriteFragmentDirections.actionFavouriteFragmentToMapFragment3(
-                        "Favourite",
-                        "-"
+            if (connectivityManager.activeNetworkInfo?.isConnected == true) {
+                Navigation.findNavController(binding.root)
+                    .navigate(
+                        FavouriteFragmentDirections.actionFavouriteFragmentToMapFragment3(
+                            "Favourite",
+                            "-"
+                        )
                     )
-                )
+            } else {
+                Toast.makeText(
+                    requireContext(),
+                    "please open internet to view more details",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
         }
     }
+
     override fun deleteItem(favouriteCountries: FavouriteCountries) {
         viewModel.deleteFavouriteCountry(favouriteCountries)
     }
+
     override fun onItemClick(favouriteCountries: FavouriteCountries) {
-        val action =FavouriteFragmentDirections.actionFavouriteFragmentToHomeFragment2("${favouriteCountries.longitude}","${favouriteCountries.latitude}")
-        Navigation.findNavController(binding.root)
-            .navigate(
-                action
+        if (connectivityManager.activeNetworkInfo?.isConnected == true) {
+            val action = FavouriteFragmentDirections.actionFavouriteFragmentToHomeFragment2(
+                "${favouriteCountries.longitude}",
+                "${favouriteCountries.latitude}"
             )
+            Navigation.findNavController(binding.root)
+                .navigate(
+                    action
+                )
+        } else {
+            Toast.makeText(
+                requireContext(),
+                "please open internet to view more details",
+                Toast.LENGTH_SHORT
+            ).show()
+        }
     }
 }

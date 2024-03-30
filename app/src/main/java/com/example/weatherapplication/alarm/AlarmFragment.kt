@@ -5,7 +5,9 @@ import android.app.DatePickerDialog
 import android.app.PendingIntent
 import android.app.TimePickerDialog
 import android.content.Context
+
 import android.content.Intent
+import android.net.ConnectivityManager
 import android.os.Bundle
 import android.util.Log
 import androidx.fragment.app.Fragment
@@ -13,17 +15,14 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TimePicker
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.Navigation
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.weatherapplication.R
 import com.example.weatherapplication.databinding.FragmentAlarmBinding
-import com.example.weatherapplication.favouriteList.FavouriteFragmentDirections
-import com.example.weatherapplication.favouriteList.FavouriteViewModel
-import com.example.weatherapplication.favouriteList.FavouriteViewModelFactory
 import com.example.weatherapplication.localDataSource.WeatherDatabase
 import com.example.weatherapplication.localDataSource.WeatherLocalDataSource
 import com.example.weatherapplication.model.FavouriteCountries
@@ -43,6 +42,8 @@ class AlarmFragment : Fragment(), IAlarmFragment {
     private lateinit var factory: AlarmViewModelFactory
     private lateinit var viewModel: AlarmViewModel
     private lateinit var calendar: Calendar
+    private lateinit var connectivityManager: ConnectivityManager
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -54,6 +55,8 @@ class AlarmFragment : Fragment(), IAlarmFragment {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        connectivityManager =
+            requireContext().getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         factory = AlarmViewModelFactory(
             repo = WeatherRepository.getInstance(
                 WeatherRemoteDataSource.getInstance(),
@@ -83,9 +86,16 @@ class AlarmFragment : Fragment(), IAlarmFragment {
         binding.rvAlarmList.layoutManager = linearLayoutManager
         alarmAdapter = AlarmAdapter(listOf(), this)
         binding.rvAlarmList.adapter = alarmAdapter
-
         binding.fabCreateAlarm.setOnClickListener {
-            pickTimeAndDate()
+            if (connectivityManager.activeNetworkInfo?.isConnected == true) {
+                pickTimeAndDate()
+            } else {
+                Toast.makeText(
+                    requireContext(),
+                    "please open internet to view more details",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
         }
     }
 
@@ -99,8 +109,6 @@ class AlarmFragment : Fragment(), IAlarmFragment {
                 calendar.set(Calendar.YEAR, year)
                 calendar.set(Calendar.MONTH, monthOfYear)
                 calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth)
-                Log.i(TAG, "showTimePickerDialog: $calendar")
-                Log.i(TAG, "showTimePickerDialog: ${calendar.timeInMillis}")
                 Navigation.findNavController(requireView()).navigate(
                     AlarmFragmentDirections.actionAlarmFragmentToMapFragment(
                         "Alarm",
@@ -132,11 +140,24 @@ class AlarmFragment : Fragment(), IAlarmFragment {
     }
 
     override fun onItemClick(favouriteCountries: FavouriteCountries) {
-        val action =AlarmFragmentDirections.actionAlarmFragmentToHomeFragment2("${favouriteCountries.longitude}","${favouriteCountries.latitude}")
-        Navigation.findNavController(binding.root)
-            .navigate(
-                action
+        if (connectivityManager.activeNetworkInfo?.isConnected == true) {
+
+            val action = AlarmFragmentDirections.actionAlarmFragmentToHomeFragment2(
+                "${favouriteCountries.longitude}",
+                "${favouriteCountries.latitude}"
             )
+            Navigation.findNavController(binding.root)
+                .navigate(
+                    action
+                )
+        } else {
+            Toast.makeText(
+                requireContext(),
+                "please open internet to view more details",
+                Toast.LENGTH_SHORT
+            ).show()
+
+        }
     }
 
     private fun stopAlarm(favouriteCountries: FavouriteCountries) {

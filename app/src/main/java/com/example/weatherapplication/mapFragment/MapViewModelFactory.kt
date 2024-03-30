@@ -1,15 +1,15 @@
-package com.example.weatherapplication.alarm
+package com.example.weatherapplication.mapFragment
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.weatherapplication.repository.IWeatherRepository
-import com.example.weatherapplication.repository.WeatherRepository
 
-class AlarmViewModelFactory(private val repo: IWeatherRepository) : ViewModelProvider.Factory{
+
+class MapViewModelFactory(private val repo: IWeatherRepository) : ViewModelProvider.Factory {
 
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return if (modelClass.isAssignableFrom(AlarmViewModel::class.java)){
-            AlarmViewModel(repo) as T
+        return if (modelClass.isAssignableFrom(MapViewModel::class.java)){
+            MapViewModel(repo) as T
         }else{
             throw IllegalArgumentException("View model class not found")
         }

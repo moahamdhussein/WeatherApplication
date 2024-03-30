@@ -13,15 +13,21 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.Navigation
 import com.example.weatherapplication.R
 import com.example.weatherapplication.alarm.AlarmReceiver
 import com.example.weatherapplication.databinding.FragmentMapBinding
+import com.example.weatherapplication.localDataSource.WeatherDatabase
 import com.example.weatherapplication.localDataSource.WeatherLocalDataSource
 import com.example.weatherapplication.model.FavouriteCountries
+import com.example.weatherapplication.remoteDataSource.WeatherRemoteDataSource
+import com.example.weatherapplication.repository.WeatherRepository
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.osmdroid.api.IMapController
@@ -47,6 +53,8 @@ class MapFragment : Fragment() {
     private lateinit var selectedLocationMarker: Marker
     private lateinit var type: String
     private lateinit var date: String
+    private lateinit var factory: MapViewModelFactory
+    private lateinit var viewModel: MapViewModel
 
 
     override fun onCreateView(
@@ -73,6 +81,15 @@ class MapFragment : Fragment() {
 
 
     private fun initializeUi() {
+        factory = MapViewModelFactory(
+            WeatherRepository.getInstance(
+                WeatherRemoteDataSource.getInstance(),
+                WeatherLocalDataSource(
+                    WeatherDatabase.getInstance(requireContext()).getFavouriteDao()
+                )
+            )
+        )
+        viewModel = ViewModelProvider(this, factory)[MapViewModel::class.java]
         Configuration.getInstance()
             .load(requireContext(), PreferenceManager.getDefaultSharedPreferences(requireContext()))
         Configuration.getInstance().userAgentValue = BuildConfig.LIBRARY_PACKAGE_NAME
@@ -143,58 +160,50 @@ class MapFragment : Fragment() {
             val selectedLocation = selectedLocationMarker.position
             val lat = selectedLocation.latitude
             val long = selectedLocation.longitude
-
-            val localDataSource = WeatherLocalDataSource(requireContext())
             val cityName = getAddressFromLocation(lat, long)
-            lifecycleScope.launch(Dispatchers.IO) {
-                var alarmId = Int.MIN_VALUE
-                Log.i(TAG, "onSaveClick: ${type == "Alarm"}")
-                if (type == "Alarm") {
-                    alarmId = (1..250).random()
-                    scheduleAlarm(requireContext(), date.toLong(), alarmId)
-                }
-                localDataSource.insertFavouriteCountry(
-                    FavouriteCountries(
-                        long,
-                        lat,
-                        cityName,
-                        type,
-                        date,
-                        alarmId
-                    )
-                )
-                launch(Dispatchers.Main) {
-
-                Navigation.findNavController(binding.root).popBackStack()
-                }
+            var alarmId = Int.MIN_VALUE
+            if (type == "Alarm") {
+                alarmId = (1..250).random()
+                scheduleAlarm(requireContext(), date.toLong(), alarmId)
             }
+            viewModel.insertFavourite(
+                FavouriteCountries(
+                    long,
+                    lat,
+                    cityName,
+                    type,
+                    date,
+                    alarmId
+                )
+            )
+            Navigation.findNavController(binding.root).popBackStack()
         } else {
 
-            Log.i(TAG, "setListeners: not selected")
+            view?.let {
+                Snackbar.make(
+                    it,
+                    "please pickUp location by press and hold in any location you need",
+                    Snackbar.ANIMATION_MODE_SLIDE
+                ).show()
+            }
         }
     }
 
     fun getAddressFromLocation(latitude: Double, longitude: Double): String {
         val geocoder = Geocoder(requireContext())
         val addresses: List<Address>? = geocoder.getFromLocation(latitude, longitude, 1)
-        Log.i(TAG, "getAddressFromLocation: " + addresses.toString())
         val cityName = addresses?.get(0)?.adminArea
         val countryName = addresses?.get(0)?.countryName
         return "${cityName?.split("G", "g")?.get(0) ?: ""} $countryName"
     }
 
     fun scheduleAlarm(context: Context, triggerAtMillis: Long, alarmId: Int) {
-        Log.i(TAG, "scheduleAlarm: ")
         val alarmManager = context.getSystemService(AppCompatActivity.ALARM_SERVICE) as AlarmManager
         val intent = Intent(context, AlarmReceiver::class.java)
         val pendingIntent = PendingIntent.getBroadcast(
             context, alarmId, intent,
             PendingIntent.FLAG_IMMUTABLE
         )
-
-//           alarmManager.setExact(AlarmManager.RTC_WAKEUP, triggerAtMillis, pendingIntent)
-
         alarmManager.setAndAllowWhileIdle(AlarmManager.RTC_WAKEUP, triggerAtMillis, pendingIntent)
-        Log.i(TAG, "scheduleAlarm: ")
     }
 }

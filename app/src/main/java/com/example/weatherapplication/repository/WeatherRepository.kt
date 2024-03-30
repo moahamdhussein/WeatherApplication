@@ -1,6 +1,5 @@
 package com.example.weatherapplication.repository
 
-import com.example.weatherapplication.Constant
 import com.example.weatherapplication.localDataSource.IWeatherLocalDataSource
 import com.example.weatherapplication.model.FavouriteCountries
 import com.example.weatherapplication.model.Root

@@ -24,7 +24,9 @@ import com.example.weatherapplication.databinding.FragmentAlarmBinding
 import com.example.weatherapplication.favouriteList.FavouriteFragmentDirections
 import com.example.weatherapplication.favouriteList.FavouriteViewModel
 import com.example.weatherapplication.favouriteList.FavouriteViewModelFactory
+import com.example.weatherapplication.localDataSource.WeatherDatabase
 import com.example.weatherapplication.localDataSource.WeatherLocalDataSource
+import com.example.weatherapplication.model.FavouriteCountries
 import com.example.weatherapplication.remoteDataSource.WeatherRemoteDataSource
 import com.example.weatherapplication.repository.WeatherRepository
 import kotlinx.coroutines.Dispatchers
@@ -34,7 +36,7 @@ import java.util.Calendar
 
 private const val TAG = "AlarmFragment"
 
-class AlarmFragment : Fragment() {
+class AlarmFragment : Fragment(), IAlarmFragment {
     private lateinit var binding: FragmentAlarmBinding
     private lateinit var linearLayoutManager: LinearLayoutManager
     private lateinit var alarmAdapter: AlarmAdapter
@@ -55,7 +57,9 @@ class AlarmFragment : Fragment() {
         factory = AlarmViewModelFactory(
             repo = WeatherRepository.getInstance(
                 WeatherRemoteDataSource.getInstance(),
-                WeatherLocalDataSource(requireContext())
+                WeatherLocalDataSource(
+                    WeatherDatabase.getInstance(requireContext()).getFavouriteDao()
+                )
             )
         )
         initializeUi()
@@ -77,7 +81,7 @@ class AlarmFragment : Fragment() {
         linearLayoutManager = LinearLayoutManager(requireContext())
         linearLayoutManager.orientation = RecyclerView.VERTICAL
         binding.rvAlarmList.layoutManager = linearLayoutManager
-        alarmAdapter = AlarmAdapter(listOf())
+        alarmAdapter = AlarmAdapter(listOf(), this)
         binding.rvAlarmList.adapter = alarmAdapter
 
         binding.fabCreateAlarm.setOnClickListener {
@@ -120,5 +124,30 @@ class AlarmFragment : Fragment() {
             }, hourOfDay, minute, true
         )
         timePickerDialog.show()
+    }
+
+    override fun deleteAlarmItem(favouriteCountries: FavouriteCountries) {
+        stopAlarm(favouriteCountries)
+        viewModel.deleteAlarmItem(favouriteCountries)
+    }
+
+    override fun onItemClick(favouriteCountries: FavouriteCountries) {
+        val action =AlarmFragmentDirections.actionAlarmFragmentToHomeFragment2("${favouriteCountries.longitude}","${favouriteCountries.latitude}")
+        Navigation.findNavController(binding.root)
+            .navigate(
+                action
+            )
+    }
+
+    private fun stopAlarm(favouriteCountries: FavouriteCountries) {
+        val alarmManager =
+            requireContext().getSystemService(AppCompatActivity.ALARM_SERVICE) as AlarmManager
+        val intent = Intent(requireContext(), AlarmReceiver::class.java)
+        val pendingIntent = PendingIntent.getBroadcast(
+            requireContext(), favouriteCountries.alarmId, intent,
+            PendingIntent.FLAG_IMMUTABLE
+        )
+        alarmManager.cancel(pendingIntent)
+
     }
 }

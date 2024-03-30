@@ -1,6 +1,5 @@
 package com.example.weatherapplication.remoteDataSource
 
-import com.example.weatherapplication.Constant
 import com.example.weatherapplication.model.Root
 import retrofit2.Response
 import retrofit2.http.GET

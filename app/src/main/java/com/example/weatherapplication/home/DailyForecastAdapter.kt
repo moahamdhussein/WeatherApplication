@@ -8,7 +8,7 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.example.weatherapplication.Constant
+import com.example.weatherapplication.utility.Constant
 import com.example.weatherapplication.R
 import com.example.weatherapplication.model.WeatherProperty
 
@@ -23,7 +23,9 @@ class DailyForecastAdapter(
     var convertCelsiusAddition = 0.0
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val unit =  context.getSharedPreferences("Setting", Context.MODE_PRIVATE).getString(Constant.TEMPERATURE_Unit,Constant.Units.CELSIUS)
+        val unit =  context.getSharedPreferences("Setting", Context.MODE_PRIVATE).getString(
+            Constant.TEMPERATURE_Unit,
+            Constant.Units.CELSIUS)
 
         when(unit){
             Constant.Units.FAHRENHEIT-> {

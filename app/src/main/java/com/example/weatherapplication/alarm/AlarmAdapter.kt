@@ -9,15 +9,10 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.weatherapplication.R
 import com.example.weatherapplication.model.FavouriteCountries
-import java.time.Instant
-import java.time.LocalDateTime
-import java.time.ZoneId
-import java.time.format.DateTimeFormatter
 import java.util.Calendar
-import java.util.Date
 
 private const val TAG = "AlarmAdapter"
-class AlarmAdapter(private var dataSet: List<FavouriteCountries>) :
+class AlarmAdapter(private var dataSet: List<FavouriteCountries> , private var listener:IAlarmFragment) :
     RecyclerView.Adapter<AlarmAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -34,7 +29,8 @@ class AlarmAdapter(private var dataSet: List<FavouriteCountries>) :
 
             holder.tvTime.text="${millisecondsToFormattedDateTime(it.date.toLong())}"
         }
-        holder.btnDelete.setOnClickListener { Log.i(TAG, "onBindViewHolder:  $currentItem") }
+        holder.btnDelete.setOnClickListener { listener.deleteAlarmItem(currentItem) }
+        holder.itemView.setOnClickListener { listener.onItemClick(currentItem) }
     }
 
     fun millisecondsToFormattedDateTime(milliseconds: Long): String {

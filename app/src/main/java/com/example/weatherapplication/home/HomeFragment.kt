@@ -24,19 +24,22 @@ import androidx.lifecycle.lifecycleScope
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.example.weatherapplication.Constant
 import com.example.weatherapplication.databinding.FragmentHomeBinding
+import com.example.weatherapplication.utility.Constant
+import com.example.weatherapplication.localDataSource.WeatherDatabase
 import com.example.weatherapplication.localDataSource.WeatherLocalDataSource
 import com.example.weatherapplication.model.Root
 import com.example.weatherapplication.model.WeatherProperty
 import com.example.weatherapplication.remoteDataSource.WeatherRemoteDataSource
 import com.example.weatherapplication.repository.WeatherRepository
+import com.example.weatherapplication.utility.ApiState
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
 import com.google.android.gms.location.LocationResult
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
@@ -63,7 +66,10 @@ class HomeFragment : Fragment() {
     private lateinit var unit: String
     private var convertCelsiusMultiplayer = 1.0
     private var convertCelsiusAddition = 0.0
-    private var isMeter :Boolean?=null
+    private var isMeter: Boolean? = null
+    private var lat: String? = null
+    private var longtuide: String? = null
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -79,11 +85,12 @@ class HomeFragment : Fragment() {
             .getBoolean(Constant.WIND_SPEED_UNIT, true)
 
 
-        when(unit){
-            Constant.Units.FAHRENHEIT-> {
+        when (unit) {
+            Constant.Units.FAHRENHEIT -> {
                 convertCelsiusMultiplayer = 9.0 / 5.0
                 convertCelsiusAddition = 32.0
             }
+
             Constant.Units.KELVIN -> convertCelsiusAddition = 273.15
         }
 
@@ -93,37 +100,93 @@ class HomeFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?
     ): View {
-
+        lat = HomeFragmentArgs.fromBundle(requireArguments()).lat
+        longtuide = HomeFragmentArgs.fromBundle(requireArguments()).longtude
         binding = FragmentHomeBinding.inflate(inflater, container, false)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        changeVisibility(View.GONE)
         initializeUi()
 
         if (connectivityManager.activeNetworkInfo?.isConnected == true) {
-//            getRefreshLocation()
-            lifecycleScope.launch {
-                viewModel.weatherStatus.collectLatest {
-                    if (it.list.size > 0) {
-                        viewModel.writeDataToFile(requireContext())
-                        updateUi(it)
+            if (longtuide.equals("notFound", true) && lat.equals("notFound", true)) {
+                getRefreshLocation()
+                lifecycleScope.launch(Dispatchers.IO) {
+                    viewModel.weatherStatus.collectLatest {
+                        launch(Dispatchers.Main) {
+                            when (it) {
+                                is ApiState.Success -> {
+                                    viewModel.writeDataToFile(requireContext())
+                                    updateUi(it.root)
+                                }
+
+                                is ApiState.Failure -> {
+
+                                }
+
+                                is ApiState.Loading -> {
+
+                                }
+                            }
+                        }
+                    }
+                }
+            } else {
+                viewModel.getWeatherStatus(lat?.toDouble(), longtuide?.toDouble(), language)
+                lifecycleScope.launch(Dispatchers.IO) {
+                    viewModel.weatherStatus.collectLatest {
+                        launch(Dispatchers.Main) {
+                            when (it) {
+                                is ApiState.Success -> {
+                                    updateUi(it.root)
+                                }
+
+                                is ApiState.Failure -> {
+
+                                }
+
+                                is ApiState.Loading -> {
+
+                                }
+                            }
+                        }
                     }
                 }
             }
         } else {
             Toast.makeText(
                 requireContext(),
-                "Open Internet to get up to date Weather Status",
+                "Open Internet to get up to date Weather Status ",
                 Toast.LENGTH_SHORT
             ).show()
             viewModel.readDataFromFile(requireContext())
-            lifecycleScope.launch {
+            lifecycleScope.launch(Dispatchers.IO) {
                 viewModel.weatherStatus.collectLatest {
-                    if (it.list.size > 0) {
-                        updateUi(it)
+//                    if (it.list.size > 0) {
+//                        launch(Dispatchers.Main) {
+//
+//                            updateUi(it)
+//                        }
+//                    }
+                    launch(Dispatchers.Main) {
+                        when (it) {
+                            is ApiState.Success -> {
+                                updateUi(it.root)
+                            }
+
+                            is ApiState.Failure -> {
+
+                            }
+
+                            is ApiState.Loading -> {
+
+                            }
+                        }
                     }
+
                 }
             }
         }
@@ -155,7 +218,9 @@ class HomeFragment : Fragment() {
         factory = HomeViewModelFactory(
             repo = WeatherRepository.getInstance(
                 WeatherRemoteDataSource.getInstance(),
-                WeatherLocalDataSource(requireContext())
+                WeatherLocalDataSource(
+                    WeatherDatabase.getInstance(requireContext()).getFavouriteDao()
+                )
             )
         )
         viewModel = ViewModelProvider(this, factory)[HomeViewModel::class.java]
@@ -167,7 +232,7 @@ class HomeFragment : Fragment() {
         super.onStart()
         if (checkLocationPermission()) {
             if (isLocationEnabled()) {
-                getRefreshLocation()
+
             } else {
                 enableLocationServes()
             }
@@ -185,6 +250,8 @@ class HomeFragment : Fragment() {
 
     @SuppressLint("SetTextI18n")
     private fun updateUi(root: Root) {
+        binding.loadingAnimation.visibility = View.GONE
+        changeVisibility(View.VISIBLE)
         setDailyListData(root.list)
         setNextDaysData(root.list)
         val dateFormat = SimpleDateFormat("EE, dd MMM", Locale.getDefault())
@@ -193,8 +260,9 @@ class HomeFragment : Fragment() {
         binding.tvCity.text = root.city?.name ?: "not found"
 
 
-        val temperature = root.list[0].main?.temp ?:0.0
-        binding.flTvDegree.text = "${((temperature * convertCelsiusMultiplayer) + convertCelsiusAddition).toInt()}°"
+        val temperature = root.list[0].main?.temp ?: 0.0
+        binding.flTvDegree.text =
+            "${((temperature * convertCelsiusMultiplayer) + convertCelsiusAddition).toInt()}°"
         Glide.with(this)
             .load("https://openweathermap.org/img/wn/${root.list[0].weather[0].icon}@2x.png")
             .into(binding.flIvMainWeatherIcon)
@@ -211,15 +279,38 @@ class HomeFragment : Fragment() {
         }
         binding.tvHumidity.text = "${root.list[0].main?.humidity}%"
 
-        if (isMeter !=false){
+        if (isMeter != false) {
             binding.tvWind.text = "${root.list[0].wind?.speed}m/s"
-        }else{
+        } else {
             binding.tvWind.text = "${(root.list[0].wind?.speed?.times(2.23694)?.toInt())}ml/h"
         }
 
 
         binding.tvCloud.text = "${root.list[0].clouds?.all}%"
         binding.tvPressure.text = "${root.list[0].main?.pressure}pha"
+    }
+
+
+    fun changeVisibility(visibilityState :Int){
+
+        binding.tvTodayDate.visibility = visibilityState
+        binding.locationIcon.visibility = visibilityState
+        binding.tvCity.visibility = visibilityState
+        binding.flMainView.visibility = visibilityState
+        binding.humidityIcon.visibility = visibilityState
+        binding.tvHumidity.visibility = visibilityState
+        binding.windIcon.visibility = visibilityState
+        binding.tvWind.visibility = visibilityState
+        binding.cloudIcon.visibility = visibilityState
+        binding.tvCloud.visibility = visibilityState
+        binding.pressureIcon.visibility=visibilityState
+        binding.tvPressure.visibility=visibilityState
+        binding.tvDailyForecastTitle.visibility = visibilityState
+        binding.rvDailyForecast.visibility = visibilityState
+        binding.rvNextDays.visibility = visibilityState
+
+
+
     }
 
     @SuppressLint("MissingPermission")
@@ -237,7 +328,7 @@ class HomeFragment : Fragment() {
                     val latitudeValue: Double = lastLocation?.latitude ?: 0.0
                     val longitudeValue: Double = lastLocation?.longitude ?: 0.0
                     Log.i(TAG, "onLocationResult: ")
-                    viewModel.getWeatherStatus(latitudeValue, longitudeValue, unit, language)
+                    viewModel.getWeatherStatus(latitudeValue, longitudeValue, language)
                     fusedLocationProvider.removeLocationUpdates(this)
                 }
             },

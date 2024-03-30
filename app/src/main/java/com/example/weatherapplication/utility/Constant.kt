@@ -1,4 +1,4 @@
-package com.example.weatherapplication
+package com.example.weatherapplication.utility
 
 object Constant {
     const val API_KEY: String = "c90255713cc0502875ed0e60b3e30d4d"

@@ -5,7 +5,8 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.weatherapplication.model.Root
-import com.example.weatherapplication.repository.WeatherRepository
+import com.example.weatherapplication.repository.IWeatherRepository
+import com.example.weatherapplication.utility.ApiState
 import com.google.gson.Gson
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,6 +14,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
 import java.io.File
@@ -22,23 +24,28 @@ import java.io.IOException
 
 private const val TAG = "HomeViewModel"
 
-class HomeViewModel(private val repository: WeatherRepository) : ViewModel() {
+class HomeViewModel(private val repository: IWeatherRepository) : ViewModel() {
 
-    private var _weatherStatus: MutableStateFlow<Root> = MutableStateFlow(Root())
-    val weatherStatus: StateFlow<Root> = _weatherStatus
+    private var _weatherStatus: MutableStateFlow<ApiState> = MutableStateFlow(ApiState.Loading)
+    val weatherStatus: StateFlow<ApiState> = _weatherStatus
 
+    init {
+        getWeatherStatus(null, null, null)
+    }
 
-    fun getWeatherStatus(lat: Double, lon: Double, unit: String, language: String) {
+    fun getWeatherStatus(lat: Double?, lon: Double?, language: String?) {
         viewModelScope.launch(Dispatchers.IO) {
-            repository.getWeatherDetails(lat = lat, lon = lon,  language = language)
-                .take(10)
-                .takeIf { (it.first().body()?.list?.size ?: 0) > 0 }
-                ?.catch {
-                    Log.i(TAG, "getWeatherStatus: ${it.printStackTrace()}")
-                }
-                ?.collectLatest {
-                    _weatherStatus.value = it.body() ?: Root()
-                }
+            if (lat != null && lon != null && language != null) {
+                repository.getWeatherDetails(lat = lat, lon = lon, language = language)
+
+                    .takeIf { (it.first().body()?.list?.size ?: 0) > 0 }
+                    ?.catch {
+                        _weatherStatus.value = ApiState.Failure(it.message.toString())
+                    }
+                    ?.collectLatest {
+                        _weatherStatus.value = ApiState.Success(it.body() ?: Root())
+                    }
+            }
         }
     }
 
@@ -47,7 +54,7 @@ class HomeViewModel(private val repository: WeatherRepository) : ViewModel() {
             try {
                 val file = File(context.cacheDir, "responseData")
                 val fos = FileOutputStream(file)
-                val jsonString = Gson().toJson(_weatherStatus.value)
+                val jsonString = Gson().toJson((_weatherStatus.value as ApiState.Success).root)
                 fos.write(jsonString.toByteArray())
             } catch (e: IOException) {
                 Log.i(TAG, "writeDataToFile: ${e.printStackTrace()}")
@@ -56,17 +63,18 @@ class HomeViewModel(private val repository: WeatherRepository) : ViewModel() {
     }
 
     fun readDataFromFile(context: Context) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             try {
                 val file = File(context.cacheDir, "responseData")
-                val fileContent = FileInputStream(file).bufferedReader().use { it.readText() }
-                val data = Gson().fromJson(fileContent, Root::class.java)
-                _weatherStatus.value = data
+                launch(Dispatchers.IO) {
+
+                    val fileContent = FileInputStream(file).bufferedReader().use { it.readText() }
+                    val data = Gson().fromJson(fileContent, Root::class.java)
+                    _weatherStatus.value = ApiState.Success(data)
+                }
             } catch (e: IOException) {
                 Log.i(TAG, "readDataFromFile: ${e.printStackTrace()}")
             }
         }
     }
-
-
 }

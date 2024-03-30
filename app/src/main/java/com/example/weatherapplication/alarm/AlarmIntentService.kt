@@ -3,21 +3,18 @@ package com.example.weatherapplication.alarm
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.IntentService
-import android.app.NotificationChannel
-import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Intent
 import android.content.Context
-import android.content.SharedPreferences
 import android.content.pm.PackageManager
-import android.os.Build
 import android.util.Log
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import com.example.weatherapplication.Constant
+import com.example.weatherapplication.utility.Constant
 import com.example.weatherapplication.MainActivity
 import com.example.weatherapplication.R
+import com.example.weatherapplication.localDataSource.WeatherDatabase
 import com.example.weatherapplication.localDataSource.WeatherLocalDataSource
 import com.example.weatherapplication.remoteDataSource.WeatherRemoteDataSource
 import com.example.weatherapplication.repository.WeatherRepository
@@ -35,7 +32,7 @@ class AlarmIntentService : IntentService("AlarmIntentService"), CoroutineScope b
     private val repo by lazy {
         WeatherRepository.getInstance(
             WeatherRemoteDataSource.getInstance(),
-            WeatherLocalDataSource(this)
+            WeatherLocalDataSource(WeatherDatabase.getInstance(this).getFavouriteDao())
         )
     }
     @Deprecated("Deprecated in Java")

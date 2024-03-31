@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 
 
+private const val TAG = "AlarmReceiver"
 class AlarmReceiver : BroadcastReceiver() {
 
     override fun onReceive(context: Context, intent: Intent) {
@@ -14,6 +15,7 @@ class AlarmReceiver : BroadcastReceiver() {
         intentService.putExtra("lat",lat)
         intentService.putExtra("lon",lon)
         context.startService(intentService)
+
 
     }
 }

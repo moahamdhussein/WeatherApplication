@@ -1,14 +1,12 @@
 package com.example.weatherapplication.remoteDataSource
 
-import android.util.Log
-import com.example.weatherapplication.utility.Constant
 import com.example.weatherapplication.model.Root
+import com.example.weatherapplication.utility.Constant
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import retrofit2.Response
 
 
-private const val TAG = "WeatherRemoteDataSource"
 
 class WeatherRemoteDataSource : IWeatherRemoteDataSource {
 
@@ -18,7 +16,6 @@ class WeatherRemoteDataSource : IWeatherRemoteDataSource {
 
     override fun getWeathers(lat: Double, lon: Double,language: String): Flow<Response<Root>> {
         return flow {
-            Log.i(TAG, "getWeathers: flow send $language")
             emit(
                 weatherService.getWeatherDetails(
                     lat = lat,

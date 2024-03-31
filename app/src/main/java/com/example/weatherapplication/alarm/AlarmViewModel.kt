@@ -2,11 +2,9 @@ package com.example.weatherapplication.alarm
 
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import com.example.weatherapplication.model.FavouriteCountries
 import com.example.weatherapplication.repository.IWeatherRepository
-import com.example.weatherapplication.repository.WeatherRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -33,7 +31,7 @@ class AlarmViewModel(private val repository: IWeatherRepository) : ViewModel() {
 
     fun deleteAlarmItem(favouriteCountries: FavouriteCountries) {
         viewModelScope.launch(Dispatchers.IO) {
-            repository.deleteFavouriteCountry(favouriteCountries)
+            repository.deleteCountry(favouriteCountries)
         }
     }
 }

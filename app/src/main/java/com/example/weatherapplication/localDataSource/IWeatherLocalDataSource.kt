@@ -4,8 +4,8 @@ import com.example.weatherapplication.model.FavouriteCountries
 import kotlinx.coroutines.flow.Flow
 
 interface IWeatherLocalDataSource {
-    suspend fun insertFavouriteCountry(favouriteCountry: FavouriteCountries)
-    suspend fun deleteFavouriteCountry(favouriteCountry: FavouriteCountries)
+    suspend fun insertCountry(favouriteCountry: FavouriteCountries)
+    suspend fun deleteCountry(favouriteCountry: FavouriteCountries)
     fun getStoredFavouriteCountries(): Flow<List<FavouriteCountries>>
 
     fun getAllAlarm():Flow<List<FavouriteCountries>>

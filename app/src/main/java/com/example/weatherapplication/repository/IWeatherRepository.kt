@@ -16,7 +16,7 @@ interface IWeatherRepository {
     suspend fun getFavouriteCountries(): Flow<List<FavouriteCountries>>
     suspend fun getAllAlarm(): Flow<List<FavouriteCountries>>
 
-    suspend fun insertFavouriteCountry(favouriteCountry: FavouriteCountries)
-    suspend fun deleteFavouriteCountry(favouriteCountry: FavouriteCountries)
+    suspend fun insertCountry(favouriteCountry: FavouriteCountries)
+    suspend fun deleteCountry(favouriteCountry: FavouriteCountries)
 
 }

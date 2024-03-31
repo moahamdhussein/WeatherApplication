@@ -3,21 +3,19 @@ package com.example.weatherapplication.alarm
 import android.Manifest
 import android.annotation.SuppressLint
 import android.app.IntentService
-import android.app.PendingIntent
-import android.content.Intent
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.util.Log
 import androidx.core.app.ActivityCompat
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import com.example.weatherapplication.utility.Constant
-import com.example.weatherapplication.MainActivity
 import com.example.weatherapplication.R
 import com.example.weatherapplication.localDataSource.WeatherDatabase
 import com.example.weatherapplication.localDataSource.WeatherLocalDataSource
 import com.example.weatherapplication.remoteDataSource.WeatherRemoteDataSource
 import com.example.weatherapplication.repository.WeatherRepository
+import com.example.weatherapplication.utility.Constant
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
@@ -32,7 +30,7 @@ class AlarmIntentService : IntentService("AlarmIntentService"), CoroutineScope b
     private val repo by lazy {
         WeatherRepository.getInstance(
             WeatherRemoteDataSource.getInstance(),
-            WeatherLocalDataSource(WeatherDatabase.getInstance(this).getFavouriteDao())
+            WeatherLocalDataSource(WeatherDatabase.getInstance(this).getCountriesDao())
         )
     }
 
@@ -64,11 +62,7 @@ private fun showNotification(
     context: Context,
     title: String,
     message: String
-) /*: NotificationCompat.Builder*/ {
-
-    val activityIntent = Intent(context, MainActivity::class.java)
-    val pendingIntent =
-        PendingIntent.getActivity(context, 0, activityIntent, PendingIntent.FLAG_UPDATE_CURRENT)
+)  {
     val builder: NotificationCompat.Builder = NotificationCompat.Builder(context, "channel_id")
         .setSmallIcon(R.drawable.alarm_add)
         .setContentTitle(title)
@@ -84,10 +78,11 @@ private fun showNotification(
             Manifest.permission.POST_NOTIFICATIONS
         ) != PackageManager.PERMISSION_GRANTED
     ) {
-        return /*NotificationCompat.Builder(context)*/
+        return
+NotificationCompat.Builder(context)
+
     }
 
     notificationManager.notify(0, builder.build())
-    Log.i(TAG, "showNotification: dsdsds")
-    /*return builder*/
+
 }

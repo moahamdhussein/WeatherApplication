@@ -65,12 +65,12 @@ class FakeRepo : IWeatherRepository {
         return favouriteLocalData
     }
 
-    override suspend fun insertFavouriteCountry(favouriteCountry: FavouriteCountries) {
+    override suspend fun insertCountry(favouriteCountry: FavouriteCountries) {
         data.add(favouriteCountry)
         favouriteLocalData.value = data
     }
 
-    override suspend fun deleteFavouriteCountry(favouriteCountry: FavouriteCountries) {
+    override suspend fun deleteCountry(favouriteCountry: FavouriteCountries) {
         data.remove(favouriteCountry)
         favouriteLocalData.value = data
     }

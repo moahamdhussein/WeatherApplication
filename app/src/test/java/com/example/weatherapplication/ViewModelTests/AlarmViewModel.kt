@@ -3,13 +3,10 @@ package com.example.weatherapplication.ViewModelTests
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.example.weatherapplication.MainCoroutineRule
 import com.example.weatherapplication.alarm.AlarmViewModel
-import com.example.weatherapplication.home.HomeViewModel
 import com.example.weatherapplication.model.FavouriteCountries
 import com.example.weatherapplication.repoTests.FakeRepo
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
-import org.hamcrest.CoreMatchers
-import org.hamcrest.MatcherAssert
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.`is`
 import org.junit.Before
@@ -37,7 +34,7 @@ class AlarmViewModel {
     fun GetAllAlarmTest() = runTest {
         // given add inputs to fake repo to test
         val alarmCountry = FavouriteCountries(0.0, 0.0, "test", "Alarm", "2020", 0)
-        repo.insertFavouriteCountry(alarmCountry)
+        repo.insertCountry(alarmCountry)
 
 
         // when we call weatherStatus the return will be first item list the contain list from database
@@ -52,7 +49,7 @@ class AlarmViewModel {
     fun DeleteAlarmItemTest() = runTest {
         // given add inputs to fake repo to test
         val alarmCountry = FavouriteCountries(0.0, 0.0, "test", "Alarm", "2020", 0)
-        repo.insertFavouriteCountry(alarmCountry)
+        repo.insertCountry(alarmCountry)
 
         // when we call weatherStatus the return will be first item list the contain list from database
          viewModel.deleteAlarmItem(alarmCountry)

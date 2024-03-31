@@ -14,8 +14,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.onStart
-import kotlinx.coroutines.flow.take
 import kotlinx.coroutines.launch
 import java.io.File
 import java.io.FileInputStream
@@ -37,7 +35,6 @@ class HomeViewModel(private val repository: IWeatherRepository) : ViewModel() {
         viewModelScope.launch(Dispatchers.IO) {
             if (lat != null && lon != null && language != null) {
                 repository.getWeatherDetails(lat = lat, lon = lon, language = language)
-
                     .takeIf { (it.first().body()?.list?.size ?: 0) > 0 }
                     ?.catch {
                         _weatherStatus.value = ApiState.Failure(it.message.toString())

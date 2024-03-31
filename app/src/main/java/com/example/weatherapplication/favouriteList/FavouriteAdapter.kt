@@ -1,6 +1,5 @@
 package com.example.weatherapplication.favouriteList
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,8 +8,8 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.weatherapplication.R
 import com.example.weatherapplication.model.FavouriteCountries
+import com.google.android.material.snackbar.Snackbar
 
-private const val TAG = "FavouriteAdapter"
 
 class FavouriteAdapter(
     private var dataSet: List<FavouriteCountries>,
@@ -19,7 +18,6 @@ class FavouriteAdapter(
 
     fun setList(newData: List<FavouriteCountries>) {
         dataSet = newData
-        Log.i(TAG, "setList: ")
         notifyDataSetChanged()
     }
 
@@ -36,7 +34,10 @@ class FavouriteAdapter(
             holder.tvCoordinator.text = "${it.latitude} , ${it.longitude}"
         }
         holder.itemView.setOnClickListener { listener.onItemClick(currentItem) }
-        holder.btnDelete.setOnClickListener { listener.deleteItem(currentItem) }
+        holder.btnDelete.setOnClickListener {
+            Snackbar.make(holder.itemView,"Favourite deleted success ", Snackbar.ANIMATION_MODE_SLIDE).show()
+            listener.deleteItem(currentItem)
+        }
     }
 
     override fun getItemCount(): Int {

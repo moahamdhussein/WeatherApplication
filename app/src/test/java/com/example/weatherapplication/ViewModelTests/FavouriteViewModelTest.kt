@@ -2,7 +2,6 @@ package com.example.weatherapplication.ViewModelTests
 
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.example.weatherapplication.MainCoroutineRule
-import com.example.weatherapplication.alarm.AlarmViewModel
 import com.example.weatherapplication.favouriteList.FavouriteViewModel
 import com.example.weatherapplication.model.FavouriteCountries
 import com.example.weatherapplication.repoTests.FakeRepo
@@ -34,7 +33,7 @@ class FavouriteViewModelTest {
     fun GetAllAlarmTest() = runTest {
         // given add inputs to fake repo to test
         val favouriteCountries = FavouriteCountries(0.0, 0.0, "test", "Favourite", "2020", 0)
-        repo.insertFavouriteCountry(favouriteCountries)
+        repo.insertCountry(favouriteCountries)
 
 
         // when we call weatherStatus the return will be first item list the contain list from database
@@ -51,7 +50,7 @@ class FavouriteViewModelTest {
         // given add inputs to fake repo to test
         val favouriteCountry = FavouriteCountries(0.0, 0.0, "test", "Favourite", "2020", 0)
 
-        repo.insertFavouriteCountry(favouriteCountry)
+        repo.insertCountry(favouriteCountry)
 
         // when we call weatherStatus the return will be first item list the contain list from database
         viewModel.deleteFavouriteCountry(favouriteCountry)

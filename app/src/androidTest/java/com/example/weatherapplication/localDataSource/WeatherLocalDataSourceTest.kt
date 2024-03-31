@@ -1,16 +1,11 @@
 package com.example.weatherapplication.localDataSource
 
-import org.junit.Assert.*
-
 
 import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.MediumTest
-import com.example.weatherapplication.localDataSource.FavouriteDao
-import com.example.weatherapplication.localDataSource.WeatherDatabase
-import com.example.weatherapplication.localDataSource.WeatherLocalDataSource
 import com.example.weatherapplication.model.FavouriteCountries
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
@@ -18,6 +13,7 @@ import kotlinx.coroutines.test.runTest
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.`is`
 import org.junit.After
+import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -29,9 +25,10 @@ import org.junit.runner.RunWith
 class WeatherLocalDataSourceTest {
     @get:Rule
     var instanceExecutorRule = InstantTaskExecutorRule()
+
     lateinit var localDataSource: WeatherLocalDataSource
     lateinit var database: WeatherDatabase
-    lateinit var dao: FavouriteDao
+    lateinit var dao: CountriesDao
     @Before
     fun setUp() {
         database = Room.inMemoryDatabaseBuilder(
@@ -40,7 +37,7 @@ class WeatherLocalDataSourceTest {
         )
             .allowMainThreadQueries()
             .build()
-        dao = database.getFavouriteDao()
+        dao = database.getCountriesDao()
         localDataSource = WeatherLocalDataSource(dao)
     }
     @Test
@@ -49,7 +46,7 @@ class WeatherLocalDataSourceTest {
         val alarmItem = FavouriteCountries(0.0, 0.0, "alex", "Alarm", "23025", 150)
 
         // When we call insert dao take input and insert it in database
-        localDataSource.insertFavouriteCountry(alarmItem)
+        localDataSource.insertCountry(alarmItem)
 
         // then we get first element and check validation of data and is should be true
         val loadData = localDataSource.getAllAlarm().first()[0]
@@ -65,10 +62,10 @@ class WeatherLocalDataSourceTest {
     fun deleteAlarmItem() = runTest {
         // given input one alarm object with type alarm
         val alarmItem = FavouriteCountries(0.0, 0.0, "alex", "Alarm", "23025", 150)
-        localDataSource.insertFavouriteCountry(alarmItem)
+        localDataSource.insertCountry(alarmItem)
 
         // When we call delete dao take input and delete it in database
-        localDataSource.deleteFavouriteCountry(alarmItem)
+        localDataSource.deleteCountry(alarmItem)
 
         // then we get first element and check validation of data and is should be true
         val loadData = localDataSource.getAllAlarm().first()
@@ -84,11 +81,11 @@ class WeatherLocalDataSourceTest {
         val alarmItem3 = FavouriteCountries(2.0, 0.0, "alex", "Alarm", "23025", 150)
         val alarmItem4 = FavouriteCountries(3.0, 0.0, "alex", "Alarm", "23025", 150)
         val alarmItem5 = FavouriteCountries(4.0, 0.0, "alex", "Favourite", "23025", 150)
-        localDataSource.insertFavouriteCountry(alarmItem1)
-        localDataSource.insertFavouriteCountry(alarmItem2)
-        localDataSource.insertFavouriteCountry(alarmItem3)
-        localDataSource.insertFavouriteCountry(alarmItem4)
-        localDataSource.insertFavouriteCountry(alarmItem5)
+        localDataSource.insertCountry(alarmItem1)
+        localDataSource.insertCountry(alarmItem2)
+        localDataSource.insertCountry(alarmItem3)
+        localDataSource.insertCountry(alarmItem4)
+        localDataSource.insertCountry(alarmItem5)
 
         //when get All item that save with type Alarm
         val alarmData = localDataSource.getAllAlarm().first()
@@ -108,11 +105,11 @@ class WeatherLocalDataSourceTest {
         val alarmItem3 = FavouriteCountries(2.0, 0.0, "alex", "Favourite", "23025", 150)
         val alarmItem5 = FavouriteCountries(3.0, 0.0, "alex", "Favourite", "23025", 150)
         val alarmItem4 = FavouriteCountries(5.0, 0.0, "alex", "Alarm", "23025", 150)
-        localDataSource.insertFavouriteCountry(alarmItem1)
-        localDataSource.insertFavouriteCountry(alarmItem2)
-        localDataSource.insertFavouriteCountry(alarmItem3)
-        localDataSource.insertFavouriteCountry(alarmItem4)
-        localDataSource.insertFavouriteCountry(alarmItem5)
+        localDataSource.insertCountry(alarmItem1)
+        localDataSource.insertCountry(alarmItem2)
+        localDataSource.insertCountry(alarmItem3)
+        localDataSource.insertCountry(alarmItem4)
+        localDataSource.insertCountry(alarmItem5)
 
         //when get All item that save with type Alarm
         val favouriteData = localDataSource.getStoredFavouriteCountries().first()

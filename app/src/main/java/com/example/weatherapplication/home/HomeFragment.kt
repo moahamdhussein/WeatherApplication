@@ -1,23 +1,18 @@
 package com.example.weatherapplication.home
 
-import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
-import android.content.pm.PackageManager
 import android.location.LocationManager
 import android.net.ConnectivityManager
 import android.os.Bundle
 import android.os.Looper
 import android.provider.Settings
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
@@ -25,7 +20,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.weatherapplication.databinding.FragmentHomeBinding
-import com.example.weatherapplication.utility.Constant
 import com.example.weatherapplication.localDataSource.WeatherDatabase
 import com.example.weatherapplication.localDataSource.WeatherLocalDataSource
 import com.example.weatherapplication.model.Root
@@ -33,8 +27,8 @@ import com.example.weatherapplication.model.WeatherProperty
 import com.example.weatherapplication.remoteDataSource.WeatherRemoteDataSource
 import com.example.weatherapplication.repository.WeatherRepository
 import com.example.weatherapplication.utility.ApiState
+import com.example.weatherapplication.utility.Constant
 import com.github.matteobattilana.weather.PrecipType
-import com.github.matteobattilana.weather.WeatherData
 import com.google.android.gms.location.FusedLocationProviderClient
 import com.google.android.gms.location.LocationCallback
 import com.google.android.gms.location.LocationRequest
@@ -47,9 +41,6 @@ import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
-
-private const val TAG = "HomeFragment"
-private const val REQUEST_LOCATION_CODE = 101
 
 class HomeFragment : Fragment() {
     private lateinit var viewModel: HomeViewModel
@@ -227,7 +218,7 @@ class HomeFragment : Fragment() {
             repo = WeatherRepository.getInstance(
                 WeatherRemoteDataSource.getInstance(),
                 WeatherLocalDataSource(
-                    WeatherDatabase.getInstance(requireContext()).getFavouriteDao()
+                    WeatherDatabase.getInstance(requireContext()).getCountriesDao()
                 )
             )
         )
@@ -235,11 +226,6 @@ class HomeFragment : Fragment() {
 
         connectivityManager =
             requireContext().getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-    }
-
-    override fun onStart() {
-        super.onStart()
-
     }
 
     @SuppressLint("SetTextI18n")
@@ -284,7 +270,6 @@ class HomeFragment : Fragment() {
             binding.weatherBackground.setWeatherData(PrecipType.SNOW)
         }else if (root.list[0].weather[0].main?.equals("rain",ignoreCase = true) ==true){
             binding.weatherBackground.setWeatherData(PrecipType.RAIN)
-            Log.i(TAG, "updateUi: rain")
         }else{
             binding.weatherBackground.setWeatherData(PrecipType.CLEAR)
         }
@@ -330,7 +315,6 @@ class HomeFragment : Fragment() {
                     val lastLocation = locatioResult.lastLocation
                     val latitudeValue: Double = lastLocation?.latitude ?: 0.0
                     val longitudeValue: Double = lastLocation?.longitude ?: 0.0
-                    Log.i(TAG, "onLocationResult: ")
                     viewModel.getWeatherStatus(latitudeValue, longitudeValue, language)
                     fusedLocationProvider.removeLocationUpdates(this)
                 }

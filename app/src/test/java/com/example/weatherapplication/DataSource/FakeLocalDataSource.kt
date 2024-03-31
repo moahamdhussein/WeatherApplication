@@ -9,12 +9,12 @@ class FakeLocalDataSource() :IWeatherLocalDataSource{
 
     private val localDataSource :MutableList<FavouriteCountries> = mutableListOf()
     private val stateData:MutableStateFlow<List<FavouriteCountries>> =  MutableStateFlow(listOf())
-    override suspend fun insertFavouriteCountry(favouriteCountry: FavouriteCountries) {
+    override suspend fun insertCountry(favouriteCountry: FavouriteCountries) {
         localDataSource.add(favouriteCountry)
         stateData.value = localDataSource
     }
 
-    override suspend fun deleteFavouriteCountry(favouriteCountry: FavouriteCountries) {
+    override suspend fun deleteCountry(favouriteCountry: FavouriteCountries) {
         localDataSource.remove(favouriteCountry)
         stateData.value = localDataSource
     }

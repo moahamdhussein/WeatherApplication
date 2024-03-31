@@ -11,7 +11,7 @@ class MapViewModel (private val repository: IWeatherRepository) : ViewModel() {
 
     fun insertFavourite(favouriteCountries: FavouriteCountries){
         viewModelScope.launch(Dispatchers.IO) {
-            repository.insertFavouriteCountry(favouriteCountries)
+            repository.insertCountry(favouriteCountries)
         }
     }
 }

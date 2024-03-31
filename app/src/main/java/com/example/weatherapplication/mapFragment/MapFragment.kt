@@ -1,6 +1,5 @@
 package com.example.weatherapplication.mapFragment
 
-import android.annotation.SuppressLint
 import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
@@ -10,7 +9,6 @@ import android.location.Geocoder
 import android.net.ConnectivityManager
 import android.os.Bundle
 import android.preference.PreferenceManager
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -18,7 +16,6 @@ import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.Navigation
 import com.example.weatherapplication.R
 import com.example.weatherapplication.alarm.AlarmReceiver
@@ -29,8 +26,6 @@ import com.example.weatherapplication.model.FavouriteCountries
 import com.example.weatherapplication.remoteDataSource.WeatherRemoteDataSource
 import com.example.weatherapplication.repository.WeatherRepository
 import com.google.android.material.snackbar.Snackbar
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import org.osmdroid.api.IMapController
 import org.osmdroid.config.Configuration
 import org.osmdroid.events.MapEventsReceiver
@@ -41,10 +36,7 @@ import org.osmdroid.views.overlay.MapEventsOverlay
 import org.osmdroid.views.overlay.Marker
 import org.osmdroid.views.overlay.mylocation.GpsMyLocationProvider
 import org.osmdroid.views.overlay.mylocation.MyLocationNewOverlay
-import java.util.Calendar
-import kotlin.math.log
 
-private const val TAG = "MapFragment"
 
 class MapFragment : Fragment() {
 
@@ -84,7 +76,7 @@ class MapFragment : Fragment() {
             WeatherRepository.getInstance(
                 WeatherRemoteDataSource.getInstance(),
                 WeatherLocalDataSource(
-                    WeatherDatabase.getInstance(requireContext()).getFavouriteDao()
+                    WeatherDatabase.getInstance(requireContext()).getCountriesDao()
                 )
             )
         )
@@ -163,6 +155,8 @@ class MapFragment : Fragment() {
                 val sharedPreferences =
                     requireContext().getSharedPreferences("Setting", Context.MODE_PRIVATE)
                 val editor = sharedPreferences.edit()
+                Toast.makeText(requireContext(),"Main location changed success",Toast.LENGTH_SHORT).show()
+
                 editor.putString("mainLat", "$lat")
                 editor.putString("mainLon", "$long")
                 editor.apply()
@@ -171,8 +165,10 @@ class MapFragment : Fragment() {
                 var alarmId = Int.MIN_VALUE
                 if (type == "Alarm") {
                     alarmId = (1..250).random()
+                    Toast.makeText(requireContext(),"Alert schedule Done",Toast.LENGTH_SHORT).show()
                     scheduleAlarm(requireContext(), date.toLong(), alarmId, lat, long)
                 }
+                Toast.makeText(requireContext(),"Item added to favourite",Toast.LENGTH_SHORT).show()
                 viewModel.insertFavourite(
                     FavouriteCountries(
                         long,
@@ -197,7 +193,7 @@ class MapFragment : Fragment() {
         }
     }
 
-    fun getAddressFromLocation(latitude: Double, longitude: Double): String {
+    private fun getAddressFromLocation(latitude: Double, longitude: Double): String {
         val connectivityManager =
             requireContext().getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
         if (connectivityManager.activeNetworkInfo?.isConnected == false) {
@@ -210,7 +206,7 @@ class MapFragment : Fragment() {
         return "${cityName?.split("G", "g")?.get(0) ?: ""} $countryName"
     }
 
-    fun scheduleAlarm(
+    private fun scheduleAlarm(
         context: Context,
         triggerAtMillis: Long,
         alarmId: Int,

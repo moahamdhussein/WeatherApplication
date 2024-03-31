@@ -1,7 +1,6 @@
 package com.example.weatherapplication.home
 
 import android.content.Context
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,12 +8,11 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
-import com.example.weatherapplication.utility.Constant
 import com.example.weatherapplication.R
-import com.example.weatherapplication.utility.getDayName
 import com.example.weatherapplication.model.WeatherProperty
+import com.example.weatherapplication.utility.Constant
+import com.example.weatherapplication.utility.getDayName
 
-private const val TAG = "NextDaysAdapter"
 
 class NextDaysAdapter(
     private var weatherProperty: MutableList<WeatherProperty>,
@@ -50,7 +48,6 @@ class NextDaysAdapter(
     override fun onBindViewHolder(holder: NextDaysAdapter.ViewHolder, position: Int) {
         if (weatherProperty.size > 0) {
             val key = dailyMinMaxTemp.keys.toList()[position]
-            Log.i(TAG, "onBindViewHolder: $key")
             if (holder.adapterPosition == 0) {
                 holder.tvTime.text = context.resources.getString(R.string.today)
             } else {
@@ -93,10 +90,7 @@ class NextDaysAdapter(
                     dailyMinMaxTemp[key]?.set(1, max)
                 }
             } else {
-                Log.i(TAG, "getMinMaxTemp: $key")
                 dailyMinMaxTemp[key] = mutableListOf(min, max)
-
-                Log.i(TAG, "getMinMaxTemp: ${dailyMinMaxTemp.keys}")
             }
 
         }

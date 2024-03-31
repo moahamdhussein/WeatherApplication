@@ -1,6 +1,5 @@
 package com.example.weatherapplication.alarm
 
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -9,9 +8,9 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.weatherapplication.R
 import com.example.weatherapplication.model.FavouriteCountries
+import com.google.android.material.snackbar.Snackbar
 import java.util.Calendar
 
-private const val TAG = "AlarmAdapter"
 class AlarmAdapter(private var dataSet: List<FavouriteCountries> , private var listener:IAlarmFragment) :
     RecyclerView.Adapter<AlarmAdapter.ViewHolder>() {
 
@@ -29,11 +28,15 @@ class AlarmAdapter(private var dataSet: List<FavouriteCountries> , private var l
 
             holder.tvTime.text="${millisecondsToFormattedDateTime(it.date.toLong())}"
         }
-        holder.btnDelete.setOnClickListener { listener.deleteAlarmItem(currentItem) }
+        holder.btnDelete.setOnClickListener {
+            Snackbar.make(holder.itemView,"Alarm deleted success ", Snackbar.ANIMATION_MODE_SLIDE).show()
+
+            listener.deleteAlarmItem(currentItem)
+        }
         holder.itemView.setOnClickListener { listener.onItemClick(currentItem) }
     }
 
-    fun millisecondsToFormattedDateTime(milliseconds: Long): String {
+    private fun millisecondsToFormattedDateTime(milliseconds: Long): String {
         val calendar = Calendar.getInstance().apply {
             timeInMillis = milliseconds
         }

@@ -4,13 +4,11 @@ import com.example.weatherapplication.DataSource.FakeLocalDataSource
 import com.example.weatherapplication.DataSource.FakeRemoteDataSource
 import com.example.weatherapplication.model.FavouriteCountries
 import com.example.weatherapplication.repository.WeatherRepository
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.test.runTest
 import org.hamcrest.MatcherAssert.assertThat
 import org.hamcrest.Matchers.`is`
-import org.junit.After
 import org.junit.Before
 import org.junit.Test
 
@@ -40,7 +38,7 @@ class RepositoryTests {
             FavouriteCountries(0.0, 0.0, "alex", "Alarm", "2020", 10)
 
         // when we call insert that mean to insert this item in local database
-        repo.insertFavouriteCountry(favouriteCountries)
+        repo.insertCountry(favouriteCountries)
 
         // then the return value is the same of expected value with type = Alarm
         assertThat(repo.getAllAlarm().first().contains(favouriteCountries), `is`(true))
@@ -60,9 +58,9 @@ class RepositoryTests {
         val favouriteCountries1 = FavouriteCountries(0.0, 0.0, "alex", "Alarm", "2020", 10)
         val favouriteCountries2 = FavouriteCountries(2.0, 0.0, "alex", "Alarm", "2020", 10)
         val favouriteCountries3 = FavouriteCountries(3.0, 0.0, "alex", "Alarm", "2020", 10)
-        repo.insertFavouriteCountry(favouriteCountries1)
-        repo.insertFavouriteCountry(favouriteCountries2)
-        repo.insertFavouriteCountry(favouriteCountries3)
+        repo.insertCountry(favouriteCountries1)
+        repo.insertCountry(favouriteCountries2)
+        repo.insertCountry(favouriteCountries3)
 
         // when we call getFavouriteCountries to get All Alarm
         val res = repo.getAllAlarm().first()
@@ -78,9 +76,9 @@ class RepositoryTests {
         val favouriteCountries1 = FavouriteCountries(0.0, 0.0, "alex", "Favourite", "2020", 10)
         val favouriteCountries2 = FavouriteCountries(2.0, 0.0, "alex", "Favourite", "2020", 10)
         val favouriteCountries3 = FavouriteCountries(3.0, 0.0, "alex", "Favourite", "2020", 10)
-        repo.insertFavouriteCountry(favouriteCountries1)
-        repo.insertFavouriteCountry(favouriteCountries2)
-        repo.insertFavouriteCountry(favouriteCountries3)
+        repo.insertCountry(favouriteCountries1)
+        repo.insertCountry(favouriteCountries2)
+        repo.insertCountry(favouriteCountries3)
 
 
         // when we call getFavouriteCountries to get All favourite country
@@ -96,13 +94,13 @@ class RepositoryTests {
         val favouriteCountries1 = FavouriteCountries(0.0, 0.0, "alex", "Favourite", "2020", 10)
         val favouriteCountries2 = FavouriteCountries(2.0, 0.0, "alex", "Alarm", "2020", 10)
         val favouriteCountries3 = FavouriteCountries(3.0, 0.0, "alex", "Favourite", "2020", 10)
-        repo.insertFavouriteCountry(favouriteCountries1)
-        repo.insertFavouriteCountry(favouriteCountries2)
-        repo.insertFavouriteCountry(favouriteCountries3)
+        repo.insertCountry(favouriteCountries1)
+        repo.insertCountry(favouriteCountries2)
+        repo.insertCountry(favouriteCountries3)
 
 
         // when we call delete that mean to delete this item in local database and decrease size of list
-        repo.deleteFavouriteCountry(favouriteCountries1)
+        repo.deleteCountry(favouriteCountries1)
 
 
         // then the return value is the same of expected value with type = 2

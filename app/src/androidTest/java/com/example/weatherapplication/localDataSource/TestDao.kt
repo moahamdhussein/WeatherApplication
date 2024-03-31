@@ -21,7 +21,7 @@ import org.junit.runner.RunWith
 @SmallTest
 class TestDao {
     lateinit var database: WeatherDatabase
-    lateinit var dao: FavouriteDao
+    lateinit var dao: CountriesDao
 
 
     @Before
@@ -30,7 +30,7 @@ class TestDao {
             getApplicationContext(),
             WeatherDatabase::class.java
         ).build()
-        dao = database.getFavouriteDao()
+        dao = database.getCountriesDao()
     }
 
 
@@ -40,7 +40,7 @@ class TestDao {
         val favouriteCountries = FavouriteCountries(0.0, 0.0, "test", "Alarm", "2020", 0)
 
         // when we call insert that take the input and add it to database
-        dao.insertProduct(favouriteCountries)
+        dao.insertCountry(favouriteCountries)
 
 
         // then return all list in database and check if list contain this input the return must be false
@@ -53,10 +53,10 @@ class TestDao {
     fun deleteItem() = runTest {
         // given the input to database
         val favouriteCountries = FavouriteCountries(0.0, 0.0, "test", "Alarm", "2020", 0)
-        dao.insertProduct(favouriteCountries)
+        dao.insertCountry(favouriteCountries)
 
         // when we call delete that take the input and delete it from database
-        dao.deleteProduct(favouriteCountries)
+        dao.deleteCountry(favouriteCountries)
 
         val loaded = dao.getAllAlarm().first()
 
@@ -70,7 +70,7 @@ class TestDao {
         // given the input to database
         val favouriteCountries = FavouriteCountries(0.0, 0.0, "test", "Alarm", "2020", 0)
         val copyObject = favouriteCountries.copy(type = "favourite")
-        dao.insertProduct(favouriteCountries)
+        dao.insertCountry(favouriteCountries)
 
         // when we call delete that take the input should contain alarmObject
         val loaded = dao.getAllAlarm().first()
@@ -86,7 +86,7 @@ class TestDao {
         // given the input to database
         val favouriteCountries = FavouriteCountries(0.0, 0.0, "test", "Favourite", "2020", 0)
         val copyObject = favouriteCountries.copy(type = "Alarm")
-        dao.insertProduct(favouriteCountries)
+        dao.insertCountry(favouriteCountries)
 
         // when we call delete that take the input should contain alarmObject
         val loaded = dao.getAllFavouriteCountries().first()

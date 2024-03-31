@@ -3,12 +3,11 @@ package com.example.weatherapplication.favouriteList
 import android.content.Context
 import android.net.ConnectivityManager
 import android.os.Bundle
-import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.Navigation
@@ -18,13 +17,12 @@ import com.example.weatherapplication.databinding.FragmentFavouriteBinding
 import com.example.weatherapplication.localDataSource.WeatherDatabase
 import com.example.weatherapplication.localDataSource.WeatherLocalDataSource
 import com.example.weatherapplication.model.FavouriteCountries
-import com.example.weatherapplication.repository.WeatherRepository
 import com.example.weatherapplication.remoteDataSource.WeatherRemoteDataSource
+import com.example.weatherapplication.repository.WeatherRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
-private const val TAG = "FavouriteFragment"
 
 class FavouriteFragment : Fragment(), IFavouriteFragment {
 
@@ -51,7 +49,7 @@ class FavouriteFragment : Fragment(), IFavouriteFragment {
             repo = WeatherRepository.getInstance(
                 WeatherRemoteDataSource.getInstance(),
                 WeatherLocalDataSource(
-                    WeatherDatabase.getInstance(requireContext()).getFavouriteDao()
+                    WeatherDatabase.getInstance(requireContext()).getCountriesDao()
                 )
             )
         )
@@ -62,7 +60,6 @@ class FavouriteFragment : Fragment(), IFavouriteFragment {
         lifecycleScope.launch(Dispatchers.IO) {
             viewModel.weatherStatus.collectLatest {
                 launch(Dispatchers.Main) {
-                    Log.i(TAG, "onViewCreated: in view model scope $it")
                     favouriteAdapter.setList(it)
                 }
             }

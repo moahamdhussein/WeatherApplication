@@ -47,11 +47,11 @@ class WeatherRepository private constructor(
         return weatherLocalDataSource.getAllAlarm()
     }
 
-    override suspend fun insertFavouriteCountry(favouriteCountry: FavouriteCountries) {
-        weatherLocalDataSource.insertFavouriteCountry(favouriteCountry)
+    override suspend fun insertCountry(favouriteCountry: FavouriteCountries) {
+        weatherLocalDataSource.insertCountry(favouriteCountry)
     }
 
-    override suspend fun deleteFavouriteCountry(favouriteCountry: FavouriteCountries) {
-        weatherLocalDataSource.deleteFavouriteCountry(favouriteCountry)
+    override suspend fun deleteCountry(favouriteCountry: FavouriteCountries) {
+        weatherLocalDataSource.deleteCountry(favouriteCountry)
     }
 }

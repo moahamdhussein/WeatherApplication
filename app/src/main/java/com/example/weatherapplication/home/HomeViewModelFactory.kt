@@ -3,7 +3,6 @@ package com.example.weatherapplication.home
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import com.example.weatherapplication.repository.IWeatherRepository
-import com.example.weatherapplication.repository.WeatherRepository
 
 class HomeViewModelFactory(private val repo: IWeatherRepository):ViewModelProvider.Factory {
 

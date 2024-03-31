@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.Flow
 
 
 @Dao
-interface FavouriteDao {
+interface CountriesDao {
 
     @Query("SELECT * FROM favourite_countries Where type like'Favourite' ")
      fun getAllFavouriteCountries(): Flow<List<FavouriteCountries>>
@@ -20,8 +20,8 @@ interface FavouriteDao {
 
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    suspend fun insertProduct(favouriteCounty: FavouriteCountries)
+    suspend fun insertCountry(favouriteCounty: FavouriteCountries)
 
     @Delete
-    suspend fun deleteProduct(favouriteCounty: FavouriteCountries)
+    suspend fun deleteCountry(favouriteCounty: FavouriteCountries)
 }

@@ -52,7 +52,7 @@ class AlarmIntentService : IntentService("AlarmIntentService"), CoroutineScope b
                 it.body().let { root ->
                     showNotification(
                         this@AlarmIntentService,
-                        "city name${root?.city?.name}",
+                        "city name ${root?.city?.name}",
                         "weather description : ${root?.list?.get(0)?.weather?.get(0)?.description ?: " not found"} and temperature = " +
                                 "${root?.list?.get(0)?.main?.temp ?: " not found"}"
                     )
@@ -76,8 +76,6 @@ fun showNotification(context: Context?, countryName:String ,weatherState: String
     ) {
         return
     }
-
-    // Create notification channel if necessary (for Android 8.0 and higher)<<<<<
     createNotificationChannel(context)
 
     val notification = NotificationCompat.Builder(context, CHANNEL_ID)
